@@ -1,5 +1,4 @@
 $(function(){
-	// This demo depends on the canvas element
 	if(!('getContext' in document.createElement('canvas'))){
 		alert('Sorry, it looks like your browser does not support canvas!');
 		return false;
@@ -81,9 +80,17 @@ function toggleChat() {
     chat_open = false;
   }
 }
+
+var nav_height = $('nav').outerHeight;
 $(document).ready(function(){
     $(".btn").click(function() {
         if ($(this).val() == "pencil")
-            $(".tool-menu").html("Colour:   <input class='color-picker' type='color'>");
-    })
+            $(".color-picker").css("visibility","visible");
+    });
+    $('#cp1').colorpicker();
+    $( window ).resize(function() {
+        nav_height = $('nav').outerHeight();
+        $('.slide-panel').css("height","calc(100% - " + nav_height + "px)");
+    });
+        
 });
