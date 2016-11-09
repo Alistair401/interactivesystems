@@ -82,3 +82,7 @@ body {
 .color-picker{
     visibility: hidden;
 }
+.thickness-picker{
+    visibility: hidden;
+    display: inline-block;
+}

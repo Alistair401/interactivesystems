@@ -12,11 +12,23 @@ app.get('/drawingApp.css', function(req, res){
 });
 
 app.get('/bootstrap-colorpicker.min.css', function(req, res){
-  res.sendFile('/colorpicker/dist/css/bootstrap-colorpicker.min.css', { root: __dirname });
+  res.sendFile('colorpicker/dist/css/bootstrap-colorpicker.min.css', { root: __dirname });
 });
 
 app.get('/bootstrap-colorpicker.min.js', function(req, res){
-  res.sendFile('/colorpicker/dist/js/bootstrap-colorpicker.min.js', { root: __dirname });
+  res.sendFile('colorpicker/dist/js/bootstrap-colorpicker.min.js', { root: __dirname });
+});
+
+app.get('/img/bootstrap-colorpicker/alpha.png', function(req, res){
+  res.sendFile('colorpicker/dist/img/bootstrap-colorpicker/alpha.png', { root: __dirname });
+});
+
+app.get('/img/bootstrap-colorpicker/hue.png', function(req, res){
+  res.sendFile('colorpicker/dist/img/bootstrap-colorpicker/hue.png', { root: __dirname });
+});
+
+app.get('/img/bootstrap-colorpicker/alpha.png', function(req, res){
+  res.sendFile('colorpicker/dist/img/bootstrap-colorpicker/saturation.png', { root: __dirname });
 });
 
 

@@ -126,7 +126,7 @@ $(document).ready(function(){
         if ($(this).val() == "eraser")
         {
             currentTool = "eraser";
-            $(".tool-menu").html("");
+            $(".thickness-picker").css("visibility","visible");
         }
     });
     $('#cp1').colorpicker();
