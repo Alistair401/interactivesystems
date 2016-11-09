@@ -30,12 +30,16 @@ body {
   height: 100%;
 }
 #send{
-  width: 100%;
+  width: calc(100% - 15px);
+  border-radius: 0;
   position: absolute;
   bottom:0;
 }
 #chat-box{
-  width: 100%;
+  overflow: hidden;
+  border-radius: 0;
+  width: calc(100% - 15px);
+  resize: none;
   position: absolute;
   bottom: 34px;
 }

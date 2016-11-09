@@ -74,7 +74,7 @@ var chat_open = false;
 
 function toggleChat() {
   if (chat_open == false) {
-    document.getElementById("chat-panel").style.width = "250px";
+    document.getElementById("chat-panel").style.width = "245px";
     chat_open = true;
   } else {
     document.getElementById("chat-panel").style.width = "15px";
