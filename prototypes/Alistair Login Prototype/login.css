@@ -14,18 +14,23 @@ body {
 }
 
 .cust-login-container {
-    width: auto;
+    width: 30%;
+    height: auto;
     text-align: center;
-    /*    background-color: #A0E4F1;*/
     padding: 10px;
+}
+.cust-login-logo{
+    margin: 10px;
+    margin-bottom: 30px;
+    width:100%;
 }
 
 .cust-login-element {
     display: inline-block;
-    margin: 10px;
+    margin: 50px;
 }
 
 .modal .modal-dialog {
-    width: 300px;
+    width: 30%;
     padding-top: 13%;
 }
