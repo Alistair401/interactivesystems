@@ -24,11 +24,11 @@ $(function(){
 			drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);
 		}
 	});
-    socket.on('eraser', function(data) {
-        if(data.erasing){
-            eraseAt(data.x, data.y);
-        }
-    })
+   	socket.on('eraser', function(data) {
+		if(data.erasing){
+			eraseAt(data.x, data.y, data.thickness);
+		}
+	});
 
 	var prev = {};
 	canvas.on('mousedown',function(e){
