@@ -19,7 +19,7 @@ $(function(){
 
 	socket.on('moving', function (data) {
 		if(data.drawing){
-			drawLine(data.prev_x, data.prev_y, data.x, data.y);
+			drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);
 		}
 	});
 
@@ -42,18 +42,21 @@ $(function(){
 				'x': e.pageX,
 				'y': e.pageY,
 				'drawing': drawing,
+                'color': $(".color-picker").val(),
 			});
 
 		if(drawing){
-			drawLine(prev.x, prev.y-64, e.pageX, e.pageY-64);
+			drawLine(prev.x, prev.y-64, e.pageX, e.pageY-64, $(".color-picker").val());
 			prev.x = e.pageX;
 			prev.y = e.pageY;
 		}
 	});
 
-	function drawLine(fromx, fromy, tox, toy){
+	function drawLine(fromx, fromy, tox, toy, color){
+        ctx.beginPath();
 		ctx.moveTo(fromx, fromy);
 		ctx.lineTo(tox, toy);
+        ctx.strokeStyle = color;
 		ctx.stroke();
 	}
 });
@@ -78,8 +81,9 @@ function toggleChat() {
     chat_open = false;
   }
 }
-
-$(".btn").click(function() {
-    if ($(this).val() == "pencil")
-        console.log("TEST");
-})
+$(document).ready(function(){
+    $(".btn").click(function() {
+        if ($(this).val() == "pencil")
+            $(".tool-menu").html("Colour:   <input class='color-picker' type='color'>");
+    })
+});
