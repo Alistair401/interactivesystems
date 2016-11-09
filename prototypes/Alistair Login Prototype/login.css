@@ -1,0 +1,31 @@
+html,
+body {
+    height: 100%;
+    background-color: #F1FAFB;
+}
+
+.cust-login-flex {
+    display: flex;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.cust-login-container {
+    width: auto;
+    text-align: center;
+    /*    background-color: #A0E4F1;*/
+    padding: 10px;
+}
+
+.cust-login-element {
+    display: inline-block;
+    margin: 10px;
+}
+
+.modal .modal-dialog {
+    width: 300px;
+    padding-top: 13%;
+}
