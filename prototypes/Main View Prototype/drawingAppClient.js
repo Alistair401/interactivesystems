@@ -118,8 +118,8 @@ var nav_height = $('nav').outerHeight;
 $(document).ready(function(){
     $(".btn").click(function() {
         if ($(this).val() == "pencil"){
+            currentTool = "pencil";
             $(".color-picker").css("visibility","visible");
-
         }
         if ($(this).val() == "eraser")
         {
