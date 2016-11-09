@@ -11,9 +11,14 @@ app.get('/drawingApp.css', function(req, res){
   res.sendFile('drawingApp.css', { root: __dirname });
 });
 
-app.get('/fontawesome/css/font-awesome.min.css', function(req, res){
-  res.sendFile('font-awesome.min.css', { root: path.join(__dirname, 'fontawesome/css') });
+app.get('/bootstrap-colorpicker.min.css', function(req, res){
+  res.sendFile('/colorpicker/dist/css/bootstrap-colorpicker.min.css', { root: __dirname });
 });
+
+app.get('/bootstrap-colorpicker.min.js', function(req, res){
+  res.sendFile('/colorpicker/dist/js/bootstrap-colorpicker.min.js', { root: __dirname });
+});
+
 
 app.get('/Logo.svg', function(req, res){
   res.sendFile('Logo.svg', { root: __dirname });

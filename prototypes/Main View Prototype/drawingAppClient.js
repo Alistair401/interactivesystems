@@ -114,8 +114,10 @@ function toggleChat() {
   }
 }
 
-var nav_height = $('nav').outerHeight;
+var nav_height;
 $(document).ready(function(){
+    nav_height = $('nav').outerHeight;
+    $('.slide-panel').css("height","calc(100% - " + nav_height + "px)");
     $(".btn").click(function() {
         if ($(this).val() == "pencil"){
             currentTool = "pencil";
@@ -124,7 +126,7 @@ $(document).ready(function(){
         if ($(this).val() == "eraser")
         {
             currentTool = "eraser";
-            $(".tool-menu").html("Thickness: <input class='thickness' min=1 max=50 type='range'>");
+            $(".tool-menu").html("");
         }
     });
     $('#cp1').colorpicker();
