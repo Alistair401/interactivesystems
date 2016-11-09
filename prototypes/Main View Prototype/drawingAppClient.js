@@ -45,12 +45,12 @@ $(function(){
 			});
 
 		if(drawing){
-			drawLine(prev.x, prev.y, e.pageX, e.pageY);
+			drawLine(prev.x, prev.y-64, e.pageX, e.pageY-64);
 			prev.x = e.pageX;
 			prev.y = e.pageY;
 		}
 	});
-	
+
 	function drawLine(fromx, fromy, tox, toy){
 		ctx.moveTo(fromx, fromy);
 		ctx.lineTo(tox, toy);
