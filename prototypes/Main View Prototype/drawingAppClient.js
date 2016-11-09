@@ -78,3 +78,8 @@ function toggleChat() {
     chat_open = false;
   }
 }
+
+$(".btn").click(function() {
+    if ($(this).val() == "pencil")
+        console.log("TEST");
+})
