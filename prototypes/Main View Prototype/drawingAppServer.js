@@ -27,9 +27,12 @@ app.get('/', function(req, res){
 //io.set('log level', 1);
 
 io.sockets.on('connection', function (socket) {
-	socket.on('mousemove', function (data) {
+	socket.on('pencil', function (data) {
 		socket.broadcast.emit('moving', data);
 	});
+    socket.on('eraser', function (data) {
+        socket.broadcast.emit('eraser', data);
+    });
 });
 
 http.listen(8000, function(){

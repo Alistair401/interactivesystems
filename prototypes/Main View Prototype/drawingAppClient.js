@@ -1,3 +1,5 @@
+var currentTool = null;
+
 $(function(){
 	// This demo depends on the canvas element
 	if(!('getContext' in document.createElement('canvas'))){
@@ -13,7 +15,7 @@ $(function(){
 	canvas.width = canvas.clientWidth;
 	canvas.height = canvas.clientHeight;
 	// A flag for drawing activity
-	var drawing = false;
+	var active = false;
 
 	var socket = io();
 
@@ -22,33 +24,58 @@ $(function(){
 			drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);
 		}
 	});
+    socket.on('eraser', function(data) {
+        if(data.erasing){
+            eraseAt(data.x, data.y);
+        }
+    })
 
 	var prev = {};
 	canvas.on('mousedown',function(e){
 		e.preventDefault();
-		drawing = true;
+		active = true;
 		prev.x = e.pageX;
 		prev.y = e.pageY;
 	});
 
 	canvas.bind('mouseup mouseleave',function(){
-		drawing = false;
+		active = false;
 	});
 
 	canvas.on('mousemove',function(e){
-			socket.emit('mousemove',{
+        if (currentTool == "pencil")
+        {
+			socket.emit('pencil',{
 				'prev_x': prev.x,
 				'prev_y': prev.y,
 				'x': e.pageX,
 				'y': e.pageY,
-				'drawing': drawing,
+				'drawing': active,
                 'color': $(".color-picker").val(),
 			});
+        }
+        if (currentTool == "eraser")
+        {
+            socket.emit('eraser',{
+                'x': e.pageX,
+                'y': e.pageY,
+                'erasing': active,
+                'thickness': $(".thickness").val(),
+            })
+        }
 
-		if(drawing){
-			drawLine(prev.x, prev.y-64, e.pageX, e.pageY-64, $(".color-picker").val());
-			prev.x = e.pageX;
-			prev.y = e.pageY;
+		if(active){
+            switch (currentTool)
+            {
+                case "pencil":
+    			    drawLine(prev.x, prev.y-64, e.pageX, e.pageY-64, $(".color-picker").val());
+    			    prev.x = e.pageX;
+    			    prev.y = e.pageY;
+                    break;
+                case "eraser":
+                    eraseAt(e.pageX, e.pageY-64, $(".thickness").val());
+                    break;
+            }
 		}
 	});
 
@@ -59,6 +86,12 @@ $(function(){
         ctx.strokeStyle = color;
 		ctx.stroke();
 	}
+    function eraseAt(x, y, thickness)
+    {
+        ctx.beginPath();
+        ctx.clearRect(x-(thickness/2), y-64-(thickness/2), thickness, thickness);
+        //ctx.clearRect(x-(thickness/2),y-(thickness/2)-64,x+(thickness/2),y+(thickness/2)-64);
+    }
 });
 
 // chat panel javascript
@@ -84,6 +117,14 @@ function toggleChat() {
 $(document).ready(function(){
     $(".btn").click(function() {
         if ($(this).val() == "pencil")
+        {
+            currentTool = "pencil";
             $(".tool-menu").html("Colour:   <input class='color-picker' type='color'>");
+        }
+        if ($(this).val() == "eraser")
+        {
+            currentTool = "eraser";
+            $(".tool-menu").html("Thickness: <input class='thickness' min=1 max=50 type='range'>");
+        }
     })
 });
