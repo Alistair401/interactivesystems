@@ -70,3 +70,8 @@ body {
   overflow-x: hidden;
   transition: 0.5s;
 }
+
+.tool-menu {
+    display: inline;
+    margin-left: 15px;
+}
