@@ -7,14 +7,6 @@ var io = require('socket.io')(http);
 
 app.use(express.static('public'));
 
-app.get('/canvasConnectClient.js', function(req, res){
-  res.sendFile('canvasConnectClient.js', { root: __dirname });
-});
-
-app.get('/Logo.svg', function(req, res){
-  res.sendFile('Logo.svg', { root: __dirname });
-});
-
 app.get('/', function(req, res){
   res.sendFile('index.html', { root: __dirname });
 });
