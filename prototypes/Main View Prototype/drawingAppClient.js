@@ -13,6 +13,15 @@ $(function () {
     // A flag for drawing activity
     var active = false;
     var socket = io();
+
+
+    socket.on("actions",function(data){
+        data.forEach(function(element){
+            drawLine(element.prev_x, element.prev_y, element.x, element.y, "Black");
+        });
+        console.log(data);
+    });
+
     socket.on('moving', function (data) {
         if (data.drawing) {
             drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);
