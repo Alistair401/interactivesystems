@@ -17,7 +17,11 @@ $(function () {
 
     socket.on("actions",function(data){
         data.forEach(function(element){
-            drawLine(element.prev_x, element.prev_y, element.x, element.y, "Black");
+            if(element.drawing){
+                drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);
+            }else if(element.erasing){
+                eraseAt(element.x, element.y, element.thickness);
+            }
         });
         console.log(data);
     });

@@ -34,6 +34,9 @@ io.sockets.on('connection', function (socket) {
 		socket.broadcast.emit('moving', data);
 	});
     socket.on('eraser', function (data) {
+        if(data.erasing){
+          actions.push(data);
+        }
         socket.broadcast.emit('eraser', data);
     });
 });
