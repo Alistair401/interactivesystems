@@ -41,7 +41,7 @@ $(function () {
                 , 'x': e.pageX
                 , 'y': e.pageY
                 , 'drawing': active
-                , 'color': $(".color-picker").val()
+                , 'color': $("#color-input").val()
             , });
         }
         if (currentTool == "eraser") {
@@ -49,18 +49,18 @@ $(function () {
                 'x': e.pageX
                 , 'y': e.pageY
                 , 'erasing': active
-                , 'thickness': $(".thickness").val()
+                , 'thickness': $("#thickness-input").val()
             , })
         }
         if (active) {
             switch (currentTool) {
             case "pencil":
-                drawLine(prev.x, prev.y - 64, e.pageX, e.pageY - 64, $(".color-picker").val());
+                drawLine(prev.x, prev.y - 64, e.pageX, e.pageY - 64, $("#color-input").val());
                 prev.x = e.pageX;
                 prev.y = e.pageY;
                 break;
             case "eraser":
-                eraseAt(e.pageX, e.pageY - 64, $(".thickness").val());
+                eraseAt(e.pageX, e.pageY - 64, $("#thickness-input").val());
                 break;
             }
         }
@@ -114,7 +114,6 @@ $(document).ready(function () {
             $(".thickness-picker").css("visibility", "visible");
         }
     });
-    $('#cp1').colorpicker();
     $(window).resize(function () {
         nav_height = $('nav').outerHeight();
         $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");

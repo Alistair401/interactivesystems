@@ -82,7 +82,12 @@ body {
 .color-picker{
     visibility: hidden;
 }
+.cust-input-format{
+    background-color: white;
+    border-radius: 2px;
+}
 .thickness-picker{
-    visibility: hidden;
     display: inline-block;
+    visibility: hidden;
+    width: 20%;
 }
