@@ -34,14 +34,7 @@ io.sockets.on('connection', function (socket) {
     socket.broadcast.emit('moving', data);
   });
 
-
-    socket.on('eraser', function (data) {
-        if(data.erasing){
-          actions.push(data);
-        }
-        socket.broadcast.emit('eraser', data);
-    });
-    socket.on('chat-message', function(data) {
+  socket.on('chat-message', function(data) {
         console.log(data.text);
         io.emit('chat-message',data);
     })
