@@ -14,6 +14,10 @@ app.get('/', function(req, res){
   res.sendFile('index.html', { root: __dirname });
 });
 
+app.get('/login', function(req, res){
+  res.sendFile('login.html', { root: __dirname });
+});
+
 // Create a new sqlite3 database if none exist
 var db = new sqlite3.Database('cc.sqlite3');
 //TODO
