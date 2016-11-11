@@ -6,8 +6,13 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var sqlite3 = require('sqlite3').verbose();
 var session = require('express-session');
+var sharedsession = require("express-socket.io-session");
 
 app.use(session({ secret: 'BernieForPres2020', cookie: { maxAge: 60000 }}));
+
+io.use(sharedsession(session, {
+    autoSave:true
+})); 
 
 // Serve static files from the public folder
 app.use(express.static('public'));
@@ -43,6 +48,7 @@ db.run("CREATE TABLE if not exists user_session (username TEXT, session_id INTEG
 io.sockets.on('connection', function (socket) {
     
   io.to(socket.id).emit("actions",actions);
+    
   
 
   socket.on('tool', function (data) {
@@ -75,7 +81,6 @@ io.sockets.on('connection', function (socket) {
         db.all("SELECT username, password FROM user WHERE username='"+data.username+"'",function(err,rows){
             if (rows.length > 0){
                 if (rows[0].password == data.password){
-                    
                     socket.emit('login_success');
                 } else {
                     socket.emit('login_failure');
