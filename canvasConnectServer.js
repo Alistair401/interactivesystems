@@ -9,9 +9,14 @@ var sqlite3 = require('sqlite3').verbose();
 // Serve static files from the public folder
 app.use(express.static('public'));
 
-// Server index.html when the root URL is accessed
+// Serve index.html when the root URL is accessed
 app.get('/', function(req, res){
   res.sendFile('index.html', { root: __dirname });
+});
+
+// Serve login.html when /login is accessed
+app.get('/login', function(req, res){
+  res.sendFile('login.html', { root: __dirname });
 });
 
 // Create a new sqlite3 database if none exist
@@ -46,8 +51,7 @@ io.sockets.on('connection', function (socket) {
             "INSERT INTO user VALUES ( ? , ? , ? )",[data.username,data.password,data.email]
         ); 
     });
-
-  socket.on('chat-message', function(data) {
+    socket.on('chat-message', function(data) {
         console.log(data.text);
         io.emit('chat-message',data);
     })

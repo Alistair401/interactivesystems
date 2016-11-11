@@ -141,14 +141,7 @@ $(function () {
             nav_height = $('nav').outerHeight();
             $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
         });
-        $("#register-submit").click(function(){
-        if ($("login-password-confirm").val() == $("login-password").val()){
-            console.log("register sent");
-            socket.emit('register_user',{
-                'username':$('#regsiter-username').val(),
-                'password':$('#register-password').val(),
-                'email':$('#register-email').val()});
-        }
+
     });
     });
 });
