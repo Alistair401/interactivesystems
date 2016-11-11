@@ -14,10 +14,6 @@ app.get('/', function(req, res){
   res.sendFile('index.html', { root: __dirname });
 });
 
-app.get('/login', function(req, res){
-  res.sendFile('login.html', { root: __dirname });
-});
-
 // Create a new sqlite3 database if none exist
 var db = new sqlite3.Database('cc.sqlite3');
 //TODO
@@ -31,12 +27,14 @@ io.sockets.on('connection', function (socket) {
 
   io.to(socket.id).emit("actions",actions);
 
-	socket.on('pencil', function (data) {
+  socket.on('tool', function (data) {
     if(data.drawing){
       actions.push(data);  
     }
-		socket.broadcast.emit('moving', data);
-	});
+    socket.broadcast.emit('moving', data);
+  });
+
+
     socket.on('eraser', function (data) {
         if(data.erasing){
           actions.push(data);
