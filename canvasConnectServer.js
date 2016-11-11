@@ -19,10 +19,10 @@ app.get('/login', function(req, res){
 });
 
 // Create a new sqlite3 database if none exist
-var db = new sqlite3.Database('cc.sqlite3');
-//TODO
-  
-
+db = new sqlite3.Database('cc.sqlite3');
+db.run("CREATE TABLE if not exists user (username TEXT PRIMARY KEY, password TEXT, email TEXT)");
+db.run("CREATE TABLE if not exists session (id INTEGER PRIMARY KEY, chathistory BLOB, settings BLOB)");
+db.run("CREATE TABLE if not exists user_session (username TEXT, session_id INTEGER)");
 
 // Delete this row if you want to see debug messages
 //io.set('log level', 1);
@@ -42,6 +42,12 @@ io.sockets.on('connection', function (socket) {
           actions.push(data);
         }
         socket.broadcast.emit('eraser', data);
+    });
+    socket.on('register_user',function(data) {
+        console.log("register received");
+        db.run(
+            "INSERT INTO user VALUES ( ? , ? , ? )",[data.username,data.password,data.email]
+        ); 
     });
 });
 
