@@ -21,8 +21,8 @@ $(function () {
                 if(element.action == "pencil"){
                 drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);//,element.width);
                 }
-                if(element.action == "paintbrush" || element.action == "eraser"){
-                    drawCircle(element.x,element.y,element.width,element.color);                     
+                if(element.action == "paintbrush"){
+                    drawCircle(element.x,element.y,element.width,element.color);
                 }
 
         }});
@@ -33,10 +33,10 @@ $(function () {
     socket.on('moving', function (data) {
         if (data.drawing) {
             if(data.action == "pencil"){
-                drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);//,data.width);               
+                drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);//,data.width);
             }
-            if(data.action == "paintbrush" || data.action == "eraser"){  
-                drawCircle(data.x,data.y,data.width,data.color);                
+            if(data.action == "paintbrush"){
+                drawCircle(data.x,data.y,data.width,data.color);
             }
         }
     });
@@ -53,13 +53,13 @@ $(function () {
     });
     canvas.on('mousemove', function (e) {
         var colorUsed;
-        
+
         if(currentTool == "paintbrush"){
             colorUsed = $("#color-input").val()
         }else if(currentTool == "eraser"){
             colorUsed = "white";
         }
-            
+
         socket.emit('tool', {
             'prev_x': prev.x
             , 'prev_y': prev.y
@@ -70,7 +70,7 @@ $(function () {
             , 'color': colorUsed
             , 'width': $("#thickness-input").val()
             , });
-        
+
         if (active) {
             switch (currentTool) {
             case "pencil":
@@ -109,6 +109,14 @@ $(function () {
         ctx.stroke();
     }
 
+    function eraseAt(x, y, thickness) {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y-64, thickness/2, 0, Math.PI*2, true);
+        ctx.fill();
+        ctx.closePath();
+        ctx.globalCompositeOperation = 'source-over;';
+    }
     var nav_height;
     $(document).ready(function () {
         $(".thickness-picker").css("visibility", "visible");
