@@ -30,8 +30,9 @@ db.run("CREATE TABLE if not exists user_session (username TEXT, session_id INTEG
 //io.set('log level', 1);
 
 io.sockets.on('connection', function (socket) {
-
   io.to(socket.id).emit("actions",actions);
+  
+  
 
   socket.on('tool', function (data) {
     if(data.drawing){
@@ -46,10 +47,15 @@ io.sockets.on('connection', function (socket) {
         socket.broadcast.emit('eraser', data);
     });
     socket.on('register_user',function(data) {
-        console.log("register received");
         db.run(
-            "INSERT INTO user VALUES ( ? , ? , ? )",[data.username,data.password,data.email]
-        ); 
+            "INSERT INTO user VALUES ( ? , ? , ? )",[data.username,data.password,data.email],function(err,rows){
+              if (err){
+                io.emit('register_fail');
+              } else {
+                io.emit('register_success');
+              }
+            }
+        );        
     });
     socket.on('chat-message', function(data) {
         console.log(data.text);
