@@ -18,6 +18,7 @@
   "homepage": "https://github.com/Alistair401/interactivesystems#readme",
   "dependencies": {
     "express": "^4.14.0",
+    "express-session": "^1.14.2",
     "socket.io": "^1.5.1",
     "sqlite3": "^3.1.8"
   }
