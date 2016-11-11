@@ -90,7 +90,7 @@ $(function () {
 
     function eraseAt(x, y, thickness) {
         ctx.beginPath();
-        ctx.clearRect(x - (thickness / 2), y - 64 - 64 - (thickness / 2), thickness, thickness);
+        ctx.clearRect(x - (thickness / 2), y - 64 - (thickness / 2), thickness, thickness);
         //ctx.clearRect(x-(thickness/2),y-(thickness/2)-64,x+(thickness/2),y+(thickness/2)-64);
     }
 });
