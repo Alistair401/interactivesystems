@@ -68,12 +68,12 @@ $(function () {
         if (active) {
             switch (currentTool) {
             case "pencil":
-                drawLine(prev.x, prev.y - 64, e.pageX, e.pageY - 64, $("#color-input").val(),$("#thickness-input").val());
+                drawLine(prev.x, prev.y, e.pageX, e.pageY, $("#color-input").val(),$("#thickness-input").val());
                 prev.x = e.pageX;
                 prev.y = e.pageY;
                 break;
             case "eraser":
-                eraseAt(e.pageX, e.pageY - 64, $("#thickness-input").val());
+                eraseAt(e.pageX, e.pageY, $("#thickness-input").val());
                 break;
             }
         }
@@ -81,8 +81,8 @@ $(function () {
 
     function drawLine(fromx, fromy, tox, toy, color,width) {
         ctx.beginPath();
-        ctx.moveTo(fromx, fromy);
-        ctx.lineTo(tox, toy);
+        ctx.moveTo(fromx, fromy - 64);
+        ctx.lineTo(tox, toy - 64);
         ctx.strokeStyle = color;
         ctx.lineWidth = width;
         ctx.stroke();
@@ -90,7 +90,7 @@ $(function () {
 
     function eraseAt(x, y, thickness) {
         ctx.beginPath();
-        ctx.clearRect(x - (thickness / 2), y - 64 - (thickness / 2), thickness, thickness);
+        ctx.clearRect(x - (thickness / 2), y - 64 - 64 - (thickness / 2), thickness, thickness);
         //ctx.clearRect(x-(thickness/2),y-(thickness/2)-64,x+(thickness/2),y+(thickness/2)-64);
     }
 });
