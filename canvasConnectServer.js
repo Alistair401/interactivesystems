@@ -61,21 +61,24 @@ io.sockets.on('connection', function (socket) {
         db.run(
             "INSERT INTO user VALUES ( ? , ? , ? )",[data.username,data.password,data.email],function(err,rows){
               if (err){
-                io.emit('register_fail');
+                socket.emit('register_fail');
               } else {
-                io.emit('register_success');
+                socket.emit('register_success');
               }
             }
         );        
+    });
+    socket.on('say to someone', function(id, msg){
+        socket.broadcast.to(id).emit('my message', msg);
     });
     socket.on('login', function(data){
         db.all("SELECT username, password FROM user WHERE username='"+data.username+"'",function(err,rows){
             if (rows.length > 0){
                 if (rows[0].password == data.password){
                     
-                    io.emit('login_success');
+                    socket.emit('login_success');
                 } else {
-                    io.emit('login_failure');
+                    socket.emit('login_failure');
                 }
             }
         });
