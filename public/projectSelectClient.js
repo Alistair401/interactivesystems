@@ -23,8 +23,5 @@ $(document).ready(function () {
   socket.on('register_fail', function () {
   });
   
-  socket.on('login_success', function () {
-      window.location.href = '/project';
-  });
 
 });

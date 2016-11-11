@@ -5,18 +5,29 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var sqlite3 = require('sqlite3').verbose();
+var session = require('express-session');
+
+app.use(session({ secret: 'BernieForPres2020', cookie: { maxAge: 60000 }}));
 
 // Serve static files from the public folder
 app.use(express.static('public'));
 
 // Serve index.html when the root URL is accessed
 app.get('/', function(req, res){
+  var sess = req.session;
   res.sendFile('index.html', { root: __dirname });
 });
 
 // Serve login.html when /login is accessed
 app.get('/login', function(req, res){
+  var sess = req.session;
   res.sendFile('login.html', { root: __dirname });
+});
+
+// Serve project_select.html when /project is accessed
+app.get('/project', function(req, res){
+  var sess = req.session;
+  res.sendFile('project_select.html', { root: __dirname });
 });
 
 // Create a new sqlite3 database if none exist
@@ -30,8 +41,8 @@ db.run("CREATE TABLE if not exists user_session (username TEXT, session_id INTEG
 //io.set('log level', 1);
 
 io.sockets.on('connection', function (socket) {
+    
   io.to(socket.id).emit("actions",actions);
-  
   
 
   socket.on('tool', function (data) {
@@ -56,6 +67,19 @@ io.sockets.on('connection', function (socket) {
               }
             }
         );        
+    });
+    socket.on('login', function(data){
+        db.all("SELECT username, password FROM user WHERE username='"+data.username+"'",function(err,rows){
+            if (rows.length > 0){
+                if (rows[0].password == data.password){
+                    
+                    io.emit('login_success');
+                } else {
+                    io.emit('login_failure');
+                }
+            }
+        });
+        
     });
     socket.on('chat-message', function(data) {
         console.log(data.text);
