@@ -145,6 +145,15 @@ $(function () {
             nav_height = $('nav').outerHeight();
             $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
         });
+        $("#register-submit").click(function(){
+        if ($("login-password-confirm").val() == $("login-password").val()){
+            console.log("register sent");
+            socket.emit('register_user',{
+                'username':$('#regsiter-username').val(),
+                'password':$('#register-password').val(),
+                'email':$('#register-email').val()});
+        }
+    });
     });
 });
 // chat panel javascript
@@ -167,42 +176,5 @@ function toggleChat() {
         chat_open = false;
     }
 }
-var nav_height;
-$(document).ready(function () {
-    $(".thickness-picker").css("visibility", "visible");
-    $(".color-picker").css("visibility", "visible");
-    nav_height = $('nav').outerHeight();
-    $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
-    $(".btn").click(function () {
-        if ($(this).val() == "pencil") {
-            currentTool = "pencil";
-            $(".color-picker").css("visibility", "visible");
-            $(".thickness-picker").css("visibility", "hidden");
-        }
-        if ($(this).val() == "paintbrush") {
-            currentTool = "paintbrush";
-            $(".color-picker").css("visibility", "visible");
-            $(".thickness-picker").css("visibility", "visible");
-        }
-        if ($(this).val() == "eraser") {
-            currentTool = "eraser";
-            $(".color-picker").css("visibility", "hidden");
-            $(".thickness-picker").css("visibility", "visible");
-        }
-    });
-
-    $(window).resize(function () {
-        nav_height = $('nav').outerHeight();
-        $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
-    });
-    $("#register-submit").click(function(){
-        if ($("login-password-confirm").val() == $("login-password").val()){
-            console.log("register sent");
-            socket.emit('register_user',{
-                'username':$('#regsiter-username').val(),
-                'password':$('#register-password').val(),
-                'email':$('#register-email').val()});
-        }
-    });
 
 });
