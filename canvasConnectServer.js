@@ -14,15 +14,12 @@ app.get('/', function(req, res){
   res.sendFile('index.html', { root: __dirname });
 });
 
-app.get('/login', function(req, res){
-  res.sendFile('login.html', { root: __dirname });
-});
-
 // Create a new sqlite3 database if none exist
-db = new sqlite3.Database('cc.sqlite3');
+var db = new sqlite3.Database('cc.sqlite3');
 db.run("CREATE TABLE if not exists user (username TEXT PRIMARY KEY, password TEXT, email TEXT)");
 db.run("CREATE TABLE if not exists session (id INTEGER PRIMARY KEY, chathistory BLOB, settings BLOB)");
 db.run("CREATE TABLE if not exists user_session (username TEXT, session_id INTEGER)");
+
 
 // Delete this row if you want to see debug messages
 //io.set('log level', 1);
@@ -31,9 +28,9 @@ io.sockets.on('connection', function (socket) {
 
   io.to(socket.id).emit("actions",actions);
 
-	socket.on('pencil', function (data) {
+  socket.on('tool', function (data) {
     if(data.drawing){
-      actions.push(data);  
+      actions.push(data);
     }
 		socket.broadcast.emit('moving', data);
 	});
@@ -49,6 +46,11 @@ io.sockets.on('connection', function (socket) {
             "INSERT INTO user VALUES ( ? , ? , ? )",[data.username,data.password,data.email]
         ); 
     });
+
+  socket.on('chat-message', function(data) {
+        console.log(data.text);
+        io.emit('chat-message',data);
+    })
 });
 
 http.listen(8000, function(){
