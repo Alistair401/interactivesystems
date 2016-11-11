@@ -18,7 +18,7 @@ $(function () {
     socket.on("actions",function(data){
         data.forEach(function(element){
             if(element.drawing){
-                drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color,element.width);
+                drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);
             }else if(element.erasing){
                 eraseAt(element.x, element.y, element.thickness);
             }
@@ -27,7 +27,7 @@ $(function () {
 
     socket.on('moving', function (data) {
         if (data.drawing) {
-            drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color,data.width);
+            drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);
         }
     });
     socket.on('eraser', function (data) {
@@ -54,7 +54,6 @@ $(function () {
                 , 'y': e.pageY
                 , 'drawing': active
                 , 'color': $("#color-input").val()
-                , 'width': $("#thickness-input").val()
             , });
         }
         if (currentTool == "eraser") {
@@ -68,7 +67,7 @@ $(function () {
         if (active) {
             switch (currentTool) {
             case "pencil":
-                drawLine(prev.x, prev.y - 64, e.pageX, e.pageY - 64, $("#color-input").val(),$("#thickness-input").val());
+                drawLine(prev.x, prev.y - 64, e.pageX, e.pageY - 64, $("#color-input").val());
                 prev.x = e.pageX;
                 prev.y = e.pageY;
                 break;
@@ -79,12 +78,11 @@ $(function () {
         }
     });
 
-    function drawLine(fromx, fromy, tox, toy, color,width) {
+    function drawLine(fromx, fromy, tox, toy, color) {
         ctx.beginPath();
         ctx.moveTo(fromx, fromy);
         ctx.lineTo(tox, toy);
         ctx.strokeStyle = color;
-        ctx.lineWidth = width;
         ctx.stroke();
     }
 
@@ -93,6 +91,28 @@ $(function () {
         ctx.clearRect(x - (thickness / 2), y - 64 - (thickness / 2), thickness, thickness);
         //ctx.clearRect(x-(thickness/2),y-(thickness/2)-64,x+(thickness/2),y+(thickness/2)-64);
     }
+    var nav_height;
+    $(document).ready(function () {
+        $(".thickness-picker").css("visibility", "visible");
+        $(".color-picker").css("visibility", "visible");
+        nav_height = $('nav').outerHeight();
+        $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
+        $(".btn").click(function () {
+            if ($(this).val() == "pencil") {
+                currentTool = "pencil";
+            }
+            if ($(this).val() == "eraser") {
+                currentTool = "eraser";
+            }
+        });
+        $(".clear-btn").click(function () {
+            socket.emit('reset');
+        })
+        $(window).resize(function () {
+            nav_height = $('nav').outerHeight();
+            $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
+        });
+    });
 });
 // chat panel javascript
 function openChat() {
@@ -114,24 +134,3 @@ function toggleChat() {
         chat_open = false;
     }
 }
-var nav_height;
-$(document).ready(function () {
-    $(".thickness-picker").css("visibility", "visible");
-    $(".color-picker").css("visibility", "visible");
-    nav_height = $('nav').outerHeight();
-    $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
-    $(".btn").click(function () {
-        if ($(this).val() == "pencil") {
-            currentTool = "pencil";
-         //   $(".color-picker").css("visibility", "visible");
-        }
-        if ($(this).val() == "eraser") {
-            currentTool = "eraser";
-           // $(".thickness-picker").css("visibility", "visible");
-        }
-    });
-    $(window).resize(function () {
-        nav_height = $('nav').outerHeight();
-        $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
-    });
-});
