@@ -17,7 +17,7 @@ app.get('/', function(req, res){
 // Create a new sqlite3 database if none exist
 var db = new sqlite3.Database('cc.sqlite3');
 //TODO
-  
+
 
 
 // Delete this row if you want to see debug messages
@@ -29,7 +29,7 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('tool', function (data) {
     if(data.drawing){
-      actions.push(data);  
+      actions.push(data);
     }
     socket.broadcast.emit('moving', data);
   });
@@ -41,6 +41,10 @@ io.sockets.on('connection', function (socket) {
         }
         socket.broadcast.emit('eraser', data);
     });
+    socket.on('chat-message', function(data) {
+        console.log(data.text);
+        io.emit('chat-message',data);
+    })
 });
 
 http.listen(8000, function(){

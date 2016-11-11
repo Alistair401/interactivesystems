@@ -29,7 +29,9 @@ $(function () {
             }
         });
     });
-
+    socket.on('chat-message', function(data) {
+        $('#chat-log').append(data.user+": "+data.text + "<br>");
+    });
     socket.on('moving', function (data) {
         if (data.drawing) {
             if(data.action == "pencil"){
@@ -57,29 +59,25 @@ $(function () {
         active = false;
     });
     canvas.on('mousemove', function (e) {
-        if (currentTool == "pencil") {
+        var toolUsed;
+        if(currentTool == "pencil"){
+            toolUsed = "pencil";
+        }else if(currentTool == "paintbrush"){
+            toolUsed = "paintbrush";
+        }
+        if (currentTool == "pencil" || currentTool == "paintbrush") {
             socket.emit('tool', {
                 'prev_x': prev.x
                 , 'prev_y': prev.y
                 , 'x': e.pageX
                 , 'y': e.pageY
-                , 'action' : "pencil"
-                , 'drawing': active
-                , 'color': $("#color-input").val()
-            , });
-        }
-        //NEW
-        if (currentTool == "paintbrush") {
-            socket.emit('tool', {
-                'x': e.pageX
-                , 'y': e.pageY
-                , 'action' : "paintbrush"
+                , 'action' : toolUsed
                 , 'drawing': active
                 , 'color': $("#color-input").val()
                 , 'width': $("#thickness-input").val()
             , });
         }
-        //END NEW
+
         if (currentTool == "eraser") {
             socket.emit('eraser', {
                 'x': e.pageX
@@ -101,6 +99,7 @@ $(function () {
             //NEW
             case "paintbrush":
                 drawCircle(e.pageX,e.pageY,$("#thickness-input").val(),$("#color-input").val());
+                break;
             }
             //END NEW
         }
@@ -111,7 +110,7 @@ $(function () {
         ctx.moveTo(fromx, fromy - 64);
         ctx.lineTo(tox, toy - 64);
         ctx.strokeStyle = color;
-        //ctx.lineWidth = width;
+
         ctx.stroke();
     }
 
@@ -131,6 +130,31 @@ $(function () {
         ctx.clearRect(x - (thickness / 2), y - 64 - (thickness / 2), thickness, thickness);
         //ctx.clearRect(x-(thickness/2),y-(thickness/2)-64,x+(thickness/2),y+(thickness/2)-64);
     }
+    var nav_height;
+    $(document).ready(function () {
+        $(".thickness-picker").css("visibility", "visible");
+        $(".color-picker").css("visibility", "visible");
+        nav_height = $('nav').outerHeight();
+        $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
+        $(".btn").click(function () {
+            if ($(this).val() == "pencil") {
+                currentTool = "pencil";
+            }
+            if ($(this).val() == "eraser") {
+                currentTool = "eraser";
+            }
+        });
+        $(".clear-btn").click(function () {
+            socket.emit('reset');
+        })
+        $('#send').click(function() {
+            socket.emit('chat-message', {'user':null, 'text':$('#chat-box').val()});
+        })
+        $(window).resize(function () {
+            nav_height = $('nav').outerHeight();
+            $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
+        });
+    });
 });
 // chat panel javascript
 function openChat() {
