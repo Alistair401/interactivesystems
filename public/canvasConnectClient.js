@@ -22,7 +22,7 @@ $(function () {
                 drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);//,element.width);
                 }
                 if(element.action == "paintbrush"){
-                    drawCircle(element.x,element.y,element.width,element.color);                     
+                    drawCircle(element.x,element.y,element.width,element.color);
                 }
             }else if(element.erasing){
                 eraseAt(element.x, element.y, element.thickness);
@@ -35,10 +35,10 @@ $(function () {
     socket.on('moving', function (data) {
         if (data.drawing) {
             if(data.action == "pencil"){
-                drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);//,data.width);               
+                drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);//,data.width);
             }
-            if(data.action == "paintbrush"){  
-                drawCircle(data.x,data.y,data.width,data.color);                
+            if(data.action == "paintbrush"){
+                drawCircle(data.x,data.y,data.width,data.color);
             }
         }
     });
@@ -126,9 +126,12 @@ $(function () {
     //END NEW
 
     function eraseAt(x, y, thickness) {
+        ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.clearRect(x - (thickness / 2), y - 64 - (thickness / 2), thickness, thickness);
-        //ctx.clearRect(x-(thickness/2),y-(thickness/2)-64,x+(thickness/2),y+(thickness/2)-64);
+        ctx.arc(x, y-64, thickness/2, 0, Math.PI*2, true);
+        ctx.fill();
+        ctx.closePath();
+        ctx.globalCompositeOperation = 'source-over;';
     }
     var nav_height;
     $(document).ready(function () {
