@@ -41,7 +41,7 @@ $(function () {
             if(data.action == "paintbrush"){
                 drawCircle(data.x,data.y,data.width,data.color);
             }
-            if (data.action == "erasing"){
+            if (data.action == "eraser"){
                 eraseAt(data.x,data.y,data.width);
             }
         }
