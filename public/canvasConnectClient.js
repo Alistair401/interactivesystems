@@ -24,6 +24,9 @@ $(function () {
                 if(element.action == "paintbrush"){
                     drawCircle(element.x,element.y,element.width,element.color);
                 }
+                if(element.action == "eraser"){
+                    eraseAt(element.x, element.y, element.width);
+                }
 
         }});
     });
@@ -37,6 +40,9 @@ $(function () {
             }
             if(data.action == "paintbrush"){
                 drawCircle(data.x,data.y,data.width,data.color);
+            }
+            if (data.action == "erasing"){
+                eraseAt(data.x,data.y,data.width);
             }
         }
     });
@@ -56,8 +62,6 @@ $(function () {
 
         if(currentTool == "paintbrush"){
             colorUsed = $("#color-input").val()
-        }else if(currentTool == "eraser"){
-            colorUsed = "white";
         }
 
         socket.emit('tool', {
@@ -79,8 +83,8 @@ $(function () {
                 prev.y = e.pageY;
                 break;
             case "eraser":
-                drawCircle(e.pageX,e.pageY,$("#thickness-input").val(),"white");
-                //eraseAt(e.pageX, e.pageY, $("#thickness-input").val());
+                //drawCircle(e.pageX,e.pageY,$("#thickness-input").val(),"white");
+                eraseAt(e.pageX, e.pageY, $("#thickness-input").val());
                 break;
             //NEW
             case "paintbrush":
@@ -112,10 +116,10 @@ $(function () {
     function eraseAt(x, y, thickness) {
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.arc(x, y-64, thickness/2, 0, Math.PI*2, true);
+        ctx.arc(x, y-64, thickness, 0, Math.PI*2, true);
         ctx.fill();
         ctx.closePath();
-        ctx.globalCompositeOperation = 'source-over;';
+        ctx.globalCompositeOperation = 'source-over';
     }
     var nav_height;
     $(document).ready(function () {
@@ -126,24 +130,30 @@ $(function () {
         $(".btn").click(function () {
             if ($(this).val() == "pencil") {
                 currentTool = "pencil";
+                $(".color-picker").css("visibility", "visible");
+                $(".thickness-picker").css("visibility", "hidden");
+            }
+            if ($(this).val() == "paintbrush") {
+                currentTool = "paintbrush";
+                $(".color-picker").css("visibility", "visible");
+                $(".thickness-picker").css("visibility", "visible");
             }
             if ($(this).val() == "eraser") {
                 currentTool = "eraser";
+                $(".color-picker").css("visibility", "hidden");
+                $(".thickness-picker").css("visibility", "visible");
             }
         });
-        $(".clear-btn").click(function () {
-            socket.emit('reset');
+        $('#send').click(function(){
+            socket.emit('chat-message', {'user':null, 'text':$('#chat-box').val()})
         })
-        $('#send').click(function() {
-            socket.emit('chat-message', {'user':null, 'text':$('#chat-box').val()});
-        })
+
         $(window).resize(function () {
             nav_height = $('nav').outerHeight();
             $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
         });
+    });
 
-    });
-    });
 });
 // chat panel javascript
 function openChat() {
@@ -165,4 +175,3 @@ function toggleChat() {
         chat_open = false;
     }
 }
-
