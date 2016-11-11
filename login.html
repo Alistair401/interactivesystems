@@ -11,9 +11,11 @@
     <!-- Custom css -->
     <link rel="stylesheet" href="login.css">
     <!-- Custom js -->
-    <script src="canvasConnectClient.js"></script>
+    <script src="loginClient.js"></script>
     <!-- Fontawesome -->
     <link rel="stylesheet" href="fontawesome/css/font-awesome.min.css"> </head>
+    <!-- Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
 
 <body>
     <div class="cust-login-flex">
@@ -47,7 +49,7 @@
                         <div class="form-group">
                             <input class="form-control" type="email" id="register-email" placeholder="E-Mail"> </div>
                         <div class="form-group">
-                            <button id="register-submit" class="btn btn-default" type="submit">Register</button>
+                            <div id="register-submit" class="btn btn-default">Register</div>
                         </div>
                     </form>
                 </div>
