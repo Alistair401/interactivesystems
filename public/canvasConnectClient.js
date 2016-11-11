@@ -24,10 +24,8 @@ $(function () {
                 if(element.action == "paintbrush"){
                     drawCircle(element.x,element.y,element.width,element.color);
                 }
-            }else if(element.erasing){
-                eraseAt(element.x, element.y, element.thickness);
-            }
-        });
+
+        }});
     });
     socket.on('chat-message', function(data) {
         $('#chat-log').append(data.user+": "+data.text + "<br>");
@@ -43,11 +41,6 @@ $(function () {
         }
     });
 
-    socket.on('eraser', function (data) {
-        if (data.erasing) {
-            eraseAt(data.x, data.y, data.thickness);
-        }
-    });
     var prev = {};
     canvas.on('mousedown', function (e) {
         e.preventDefault();
@@ -59,33 +52,25 @@ $(function () {
         active = false;
     });
     canvas.on('mousemove', function (e) {
-        var toolUsed;
-        if(currentTool == "pencil"){
-            toolUsed = "pencil";
-        }else if(currentTool == "paintbrush"){
-            toolUsed = "paintbrush";
-        }
-        if (currentTool == "pencil" || currentTool == "paintbrush") {
-            socket.emit('tool', {
-                'prev_x': prev.x
-                , 'prev_y': prev.y
-                , 'x': e.pageX
-                , 'y': e.pageY
-                , 'action' : toolUsed
-                , 'drawing': active
-                , 'color': $("#color-input").val()
-                , 'width': $("#thickness-input").val()
-            , });
+        var colorUsed;
+
+        if(currentTool == "paintbrush"){
+            colorUsed = $("#color-input").val()
+        }else if(currentTool == "eraser"){
+            colorUsed = "white";
         }
 
-        if (currentTool == "eraser") {
-            socket.emit('eraser', {
-                'x': e.pageX
-                , 'y': e.pageY
-                , 'erasing': active
-                , 'thickness': $("#thickness-input").val()
-            , })
-        }
+        socket.emit('tool', {
+            'prev_x': prev.x
+            , 'prev_y': prev.y
+            , 'x': e.pageX
+            , 'y': e.pageY
+            , 'action' : currentTool
+            , 'drawing': active
+            , 'color': colorUsed
+            , 'width': $("#thickness-input").val()
+            , });
+
         if (active) {
             switch (currentTool) {
             case "pencil":
@@ -94,7 +79,8 @@ $(function () {
                 prev.y = e.pageY;
                 break;
             case "eraser":
-                eraseAt(e.pageX, e.pageY, $("#thickness-input").val());
+                drawCircle(e.pageX,e.pageY,$("#thickness-input").val(),"white");
+                //eraseAt(e.pageX, e.pageY, $("#thickness-input").val());
                 break;
             //NEW
             case "paintbrush":
@@ -114,7 +100,6 @@ $(function () {
         ctx.stroke();
     }
 
-    //NEW
     function drawCircle(x,y,radius,color){
         ctx.beginPath();
         ctx.arc(x,y-64,radius,0,2*Math.PI,true);
@@ -123,7 +108,6 @@ $(function () {
         ctx.strokeStyle = color;
         ctx.stroke();
     }
-    //END NEW
 
     function eraseAt(x, y, thickness) {
         ctx.globalCompositeOperation = 'destination-out';
