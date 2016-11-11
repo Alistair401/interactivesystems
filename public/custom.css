@@ -43,6 +43,10 @@ body {
   position: absolute;
   bottom: 34px;
 }
+#chat-log{
+    padding:4px;
+    overflow:visible;
+}
 #canvas-container {
   flex: 1;
   order: 1;
