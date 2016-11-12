@@ -94,3 +94,6 @@ body {
     visibility: hidden;
     width: 20%;
 }
+.num-messages{
+  font-weight: bold;
+}

@@ -1,4 +1,6 @@
 var currentTool = null;
+var messages = 0;
+var chat_open = false;
 $(function () {
     if (!('getContext' in document.createElement('canvas'))) {
         alert('Sorry, it looks like your browser does not support canvas!');
@@ -31,6 +33,11 @@ $(function () {
         }});
     });
     socket.on('chat-message', function(data) {
+        if (chat_open == false)
+        {
+          messages++;
+          drawNumMessages();
+        }
         $('#chat-log').append(data.user+": "+data.text + "<br>");
     });
     socket.on('moving', function (data) {
@@ -41,7 +48,7 @@ $(function () {
             if(data.action == "paintbrush"){
                 drawCircle(data.x,data.y,data.width,data.color);
             }
-            if (data.action == "erasing"){
+            if (data.action == "eraser"){
                 eraseAt(data.x,data.y,data.width);
             }
         }
@@ -163,15 +170,19 @@ function openChat() {
 function closeChat() {
     document.getElementById("chat-panel").style.width = "0px";
 }
-var chat_open = false;
 
 function toggleChat() {
     if (chat_open == false) {
         document.getElementById("chat-panel").style.width = "245px";
         chat_open = true;
+        messages = 0;
+        drawNumMessages();
     }
     else {
         document.getElementById("chat-panel").style.width = "15px";
         chat_open = false;
     }
+}
+function drawNumMessages() {
+  $(".num-messages").html(messages);
 }
