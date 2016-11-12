@@ -94,7 +94,7 @@ io.sockets.on('connection', function (socket) {
         var sess = socket.handshake.session;
         var projects = {};
         db.all("SELECT * FROM session INNER JOIN user_session ON session.id = user_session.session_id WHERE username = '"+sess.user+"'",function(err,rows){
-            console.log(rows);
+            socket.emit('list_projects',rows);
         });
     });
     
