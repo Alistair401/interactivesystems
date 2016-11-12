@@ -21,6 +21,12 @@ io.use(sharedsession(session, {
 // Serve static files from the public folder
 app.use(express.static('public'));
 
+app.get('/session/:slug', function (req, res) {
+    console.log(req.params.slug);
+    
+    res.redirect('/');
+});
+
 // Serve index.html when the root URL is accessed
 app.get('/', function (req, res) {
     res.sendFile('index.html', {

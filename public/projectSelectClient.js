@@ -12,12 +12,12 @@ $(document).ready(function () {
     });
     $('#project-submit').click(function () {
         socket.emit('add_project', {
-            title: $('#project-title').val()
+            title: $('#project-title').val();
         });
     });
 
     $('#project-select').on('click', '.project', function () {
-        console.log($(this).attr("id"));
+        window.location.href = '/session/' + $(this).attr("id");
     });
 
     socket.on('add_project_success', function () {
