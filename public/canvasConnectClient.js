@@ -1,6 +1,7 @@
 var currentTool = null;
 var messages = 0;
 var chat_open = false;
+var nav_height = $('nav').outerHeight();
 $(function () {
     if (!('getContext' in document.createElement('canvas'))) {
         alert('Sorry, it looks like your browser does not support canvas!');
@@ -104,8 +105,8 @@ $(function () {
 
     function drawLine(fromx, fromy, tox, toy, color){//,width) {
         ctx.beginPath();
-        ctx.moveTo(fromx, fromy - 64);
-        ctx.lineTo(tox, toy - 64);
+        ctx.moveTo(fromx, fromy - nav_height);
+        ctx.lineTo(tox, toy - nav_height);
         ctx.strokeStyle = color;
 
         ctx.stroke();
@@ -113,7 +114,7 @@ $(function () {
 
     function drawCircle(x,y,radius,color){
         ctx.beginPath();
-        ctx.arc(x,y-64,radius,0,2*Math.PI,true);
+        ctx.arc(x,y-nav_height,radius,0,2*Math.PI,true);
         ctx.fillStyle = color;
         ctx.fill();
         ctx.strokeStyle = color;
@@ -123,16 +124,14 @@ $(function () {
     function eraseAt(x, y, thickness) {
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.arc(x, y-64, thickness, 0, Math.PI*2, true);
+        ctx.arc(x, y-nav_height, thickness, 0, Math.PI*2, true);
         ctx.fill();
         ctx.closePath();
         ctx.globalCompositeOperation = 'source-over';
     }
-    var nav_height;
     $(document).ready(function () {
         $(".thickness-picker").css("visibility", "visible");
         $(".color-picker").css("visibility", "visible");
-        nav_height = $('nav').outerHeight();
         $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
         $(".btn").click(function () {
             if ($(this).val() == "pencil") {
