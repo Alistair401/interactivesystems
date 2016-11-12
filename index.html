@@ -28,7 +28,7 @@
                     <button value="pencil" class="btn btn-default btn-lg btn-tool"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                     <button value="paintbrush" class="btn btn-default btn-lg btn-tool"><i class="fa fa-paint-brush" aria-hidden="true"></i></button>
                     <button value="eraser" class="btn btn-default btn-lg btn-tool"><i class="fa fa-eraser" aria-hidden="true"></i></button>
-                    <button class="btn btn-default btn-lg btn-tool"><i class="fa fa-font" aria-hidden="true"></i></button>
+                    <button value="text" class="btn btn-default btn-lg btn-tool"><i class="fa fa-font" aria-hidden="true"></i></button>
                     <div class="btn-group">
                         <button type="button" class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="fa fa-bars" aria-hidden="true"></i> </button>
                         <ul class="dropdown-menu">
@@ -43,8 +43,18 @@
                         <div class="thickness-picker">
                             <div class="cust-flex">
                                 <label>Thickness:</label>
-                                <input min=1 max=50 id="thickness-input" class="cust-input-format" type='range' /> </div>
+                                <input min=1 max=50 id="thickness-input" class="cust-input-format" type='range' />
+                            </div>
                         </div>
+                        <label class="text-picker">Text:
+                            <input type='text' class="cust-input-format" id='text-input' /> </label>
+                        <label class="size-picker">Size:
+                            <input type='text' class="cust-input-format" id='size-input' /> </label>
+                        <select id="font-picker">
+                            <option value="American text">American text</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Calibri">Calibri</option>
+                        </select>
                     </div>
                     <ul class="nav navbar-nav navbar-right">
                         <div class="btn-group">
