@@ -12,8 +12,8 @@ $(document).ready(function () {
   
   $("#login-submit").click(function(){
     socket.emit('login',{
-      'username': $('#login-username').val(),
-      'password': $('#login-password').val()
+      username: $('#login-username').val(),
+      password: $('#login-password').val()
     });
   });
   

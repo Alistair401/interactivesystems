@@ -5,33 +5,31 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var sqlite3 = require('sqlite3').verbose();
-var session = require('express-session');
+var session = require('express-session')({
+    secret: "BernieForPres2020",
+    resave: true,
+    saveUninitialized: true});
 var sharedsession = require("express-socket.io-session");
 
-app.use(session({ secret: 'BernieForPres2020', cookie: { maxAge: 60000 }}));
+app.use(session);
 
-io.use(sharedsession(session, {
-    autoSave:true
-})); 
+io.use(sharedsession(session, {autoSave:true})); 
 
 // Serve static files from the public folder
 app.use(express.static('public'));
 
 // Serve index.html when the root URL is accessed
 app.get('/', function(req, res){
-  var sess = req.session;
   res.sendFile('index.html', { root: __dirname });
 });
 
 // Serve login.html when /login is accessed
 app.get('/login', function(req, res){
-  var sess = req.session;
   res.sendFile('login.html', { root: __dirname });
 });
 
 // Serve project_select.html when /project is accessed
 app.get('/project', function(req, res){
-  var sess = req.session;
   res.sendFile('project_select.html', { root: __dirname });
 });
 
@@ -74,13 +72,13 @@ io.sockets.on('connection', function (socket) {
             }
         );        
     });
-    socket.on('say to someone', function(id, msg){
-        socket.broadcast.to(id).emit('my message', msg);
-    });
+  
     socket.on('login', function(data){
         db.all("SELECT username, password FROM user WHERE username='"+data.username+"'",function(err,rows){
             if (rows.length > 0){
                 if (rows[0].password == data.password){
+                    socket.handshake.session.user=data.username;
+                    socket.handshake.session.save();
                     socket.emit('login_success');
                 } else {
                     socket.emit('login_failure');
@@ -93,6 +91,10 @@ io.sockets.on('connection', function (socket) {
         console.log(data.text);
         io.emit('chat-message',data);
     })
+    
+    socket.on('test',function(){
+       console.log(socket.handshake.session);
+    });
 });
 
 http.listen(8000, function(){
