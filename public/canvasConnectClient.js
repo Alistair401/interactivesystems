@@ -1,7 +1,7 @@
 var currentTool = null;
 var messages = 0;
 var chat_open = false;
-var nav_height = $('nav').outerHeight();
+var nav_height;
 $(function () {
     if (!('getContext' in document.createElement('canvas'))) {
         alert('Sorry, it looks like your browser does not support canvas!');
@@ -131,6 +131,7 @@ $(function () {
         ctx.globalCompositeOperation = 'source-over';
     }
     $(document).ready(function () {
+        nav_height = $('nav').outerHeight();
         $(".thickness-picker").css("visibility", "visible");
         $(".color-picker").css("visibility", "visible");
         $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
