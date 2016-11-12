@@ -45,7 +45,9 @@ body {
 }
 #chat-log{
     padding:4px;
-    overflow:visible;
+    overflow:auto;
+    position: absolute;
+    bottom: 9%;
 }
 #canvas-container {
   flex: 1;
