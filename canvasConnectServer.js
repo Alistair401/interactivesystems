@@ -36,7 +36,7 @@ app.get('/project', function(req, res){
 // Create a new sqlite3 database if none exist
 var db = new sqlite3.Database('cc.sqlite3');
 db.run("CREATE TABLE if not exists user (username TEXT PRIMARY KEY, password TEXT, email TEXT)");
-db.run("CREATE TABLE if not exists session (id INTEGER PRIMARY KEY, chathistory BLOB, settings BLOB)");
+db.run("CREATE TABLE if not exists session (id INTEGER PRIMARY KEY, chathistory BLOB, settings BLOB, title TEXT)");
 db.run("CREATE TABLE if not exists user_session (username TEXT, session_id INTEGER)");
 
 
@@ -88,13 +88,16 @@ io.sockets.on('connection', function (socket) {
         
     });
     socket.on('chat-message', function(data) {
-        console.log(data.text);
         io.emit('chat-message',data);
     })
-    
-    socket.on('test',function(){
-       console.log(socket.handshake.session);
+    socket.on('get_projects',function(){
+        var sess = socket.handshake.session;
+        var projects = {};
+        db.all("SELECT * FROM session INNER JOIN user_session ON session.id = user_session.session_id WHERE username = '"+sess.user+"'",function(err,rows){
+            console.log(rows);
+        });
     });
+    
 });
 
 http.listen(8000, function(){
