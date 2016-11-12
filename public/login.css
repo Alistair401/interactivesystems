@@ -35,3 +35,11 @@ body {
     width: 30%;
     padding-top: 9%;
 }
+
+.cust-margin-top{
+    margin-top: 5px;
+}
+.cust-grey-text{
+    color: lightgray;
+    font-size: 75%;
+}

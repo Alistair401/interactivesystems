@@ -14,14 +14,36 @@
     <script src="projectSelectClient.js"></script>
     <!-- Fontawesome -->
     <link rel="stylesheet" href="fontawesome/css/font-awesome.min.css"> </head>
-    <!-- Socket.io -->
-    <script src="/socket.io/socket.io.js"></script>
+<!-- Socket.io -->
+<script src="/socket.io/socket.io.js"></script>
 
 <body>
     <div class="cust-login-flex">
-        <div id="project-select" class="panel panel-default cust-login-container">
-            <h3>Select a project:</h3>
-            
+        <div class="panel panel-default cust-login-container">
+            <div id="project-select">
+                <h3>Select a project:</h3>
+            </div>
+
+            <div id="add_project" class="btn btn-default btn-block btn-success cust-margin-top" data-toggle="modal" data-target="#project-modal"><i class="fa fa-plus" aria-hidden="true"></i></div>
+
+        </div>
+    </div>
+    <div class="modal fade" id="project-modal" tabindex="-1" role="dialog" aria-labelledby="projectLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="projectLabel">Register</h4> </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <input class="form-control" id="project-title" placeholder="Title"> </div>
+                        <div class="form-group">
+                            <div id="project-submit" class="btn btn-default">Register</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </body>

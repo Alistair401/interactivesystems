@@ -18,6 +18,7 @@ $(document).ready(function () {
   });
   
   socket.on('register_success', function () {
+      $('#register-modal').modal('hide');
   });
 
   socket.on('register_fail', function () {
