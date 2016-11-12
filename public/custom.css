@@ -96,6 +96,15 @@ body {
     visibility: hidden;
     width: 20%;
 }
-.num-messages{
+#num-messages{
   font-weight: bold;
+    font-size: 120%;
+    background-color: orange;
+}
+#chat-badge{
+    z-index: 3;
+    position: absolute;
+    top: 0px;
+    right: 17px;
+    visibility: hidden;
 }

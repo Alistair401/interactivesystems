@@ -36,6 +36,7 @@ $(function () {
         if (chat_open == false)
         {
           messages++;
+            $('#chat-badge').css("visibility","visible");
           drawNumMessages();
         }
         $('#chat-log').append(data.user+": "+data.text + "<br>");
@@ -134,6 +135,7 @@ $(function () {
         $(".color-picker").css("visibility", "visible");
         nav_height = $('nav').outerHeight();
         $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
+        $('#chat-badge').css("top",(nav_height + 2) + "px");
         $(".btn").click(function () {
             if ($(this).val() == "pencil") {
                 currentTool = "pencil";
@@ -158,31 +160,27 @@ $(function () {
         $(window).resize(function () {
             nav_height = $('nav').outerHeight();
             $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
+            $('#chat-badge').css("top",(nav_height + 2)  + "px");
         });
     });
 
 });
 // chat panel javascript
-function openChat() {
-    document.getElementById("chat-panel").style.width = "250px";
-}
-
-function closeChat() {
-    document.getElementById("chat-panel").style.width = "0px";
-}
-
 function toggleChat() {
     if (chat_open == false) {
         document.getElementById("chat-panel").style.width = "245px";
         chat_open = true;
         messages = 0;
+        $('#chat-badge').css("visibility","hidden");
         drawNumMessages();
     }
     else {
         document.getElementById("chat-panel").style.width = "15px";
         chat_open = false;
+        
+        
     }
 }
 function drawNumMessages() {
-  $(".num-messages").html(messages);
+  $("#num-messages").html(messages);
 }
