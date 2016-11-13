@@ -12,7 +12,7 @@ $(document).ready(function () {
     });
     $('#project-submit').click(function () {
         socket.emit('add_project', {
-            title: $('#project-title').val();
+            title: $('#project-title').val()
         });
     });
 
