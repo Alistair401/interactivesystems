@@ -33,6 +33,9 @@ app.get('/session/:slug', function (req, res) {
 
 // Serve index.html when the root URL is accessed
 app.get('/', function (req, res) {
+    if (!req.session.user){
+         res.redirect('/login');
+    }
     res.sendFile('index.html', {
         root: __dirname
     });
