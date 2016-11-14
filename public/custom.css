@@ -47,7 +47,7 @@ body {
     padding:4px;
     overflow:auto;
     position: absolute;
-    bottom: 9%;
+    bottom: 75px;
 }
 #canvas-container {
   flex: 1;

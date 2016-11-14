@@ -22,7 +22,7 @@ $(function () {
         data.forEach(function(element){
             if(element.drawing){
                 if(element.action == "pencil"){
-                drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);//,element.width);
+                    drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);//,element.width);
                 }
                 if(element.action == "paintbrush"){
                     drawCircle(element.x,element.y,element.width,element.color);
@@ -33,9 +33,12 @@ $(function () {
                 if(element.action == "text"){
                     placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
                 }
-
+                if(element.action == "line"){
+                    drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);
+                }
         }});
     });
+
     socket.on('chat-message', function(data) {
         if (chat_open == false)
         {
@@ -59,6 +62,9 @@ $(function () {
             if(data.action == "text"){
                 placeText(data.x, data.y, data.textValue, data.color, data.size, data.font);
             }
+            if(data.action == "line"){
+                drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);
+            }
         }
     });
 
@@ -68,6 +74,9 @@ $(function () {
         active = true;
         prev.x = e.pageX;
         prev.y = e.pageY;
+    });
+    
+    canvas.bind('mouseup', function (e) {
         var fontSel = document.getElementById('font-picker');
         var fontSelValue = fontSel.options[fontSel.selectedIndex];
         if (currentTool == "text"){
@@ -83,10 +92,25 @@ $(function () {
                 , });
             placeText(e.pageX, e.pageY, $('#text-input').val(), $("#color-input").val(), $("#size-input").val(), fontSelValue.text);
         }
-    });
-    canvas.bind('mouseup mouseleave', function (e) {
+        if (currentTool == "line"){
+            socket.emit('tool', {
+                'prev_x': prev.x
+                , 'prev_y': prev.y
+                , 'x': e.pageX
+                , 'y': e.pageY
+                , 'action' : currentTool
+                , 'drawing': active
+                , 'color': $("#color-input").val()
+                , });
+            drawLine(prev.x, prev.y, e.pageX, e.pageY, $("#color-input").val());
+        }
         active = false;
     });
+   
+    canvas.bind('mouseleave', function (e) {
+        active = false;
+    });
+
     canvas.on('mousemove', function (e) {
         var colorUsed;
 
@@ -94,7 +118,7 @@ $(function () {
             colorUsed = $("#color-input").val()
         }
 
-        if (currentTool != "text"){
+        if (currentTool != "text" && currentTool != "line"){
             socket.emit('tool', {
                 'prev_x': prev.x
                 , 'prev_y': prev.y
@@ -131,7 +155,6 @@ $(function () {
         ctx.moveTo(fromx, fromy - nav_height);
         ctx.lineTo(tox, toy - nav_height);
         ctx.strokeStyle = color;
-
         ctx.stroke();
     }
 
@@ -202,6 +225,24 @@ $(function () {
                 $("#font-picker").css("visibility", "visible");
             }
         });
+
+        $("#drop li a").click(function() {
+            if ($(this).children().html() == " Line Tool"){
+                currentTool = "line";
+                $(".color-picker").css("visibility", "visible");
+                $(".thickness-picker").css("visibility", "hidden");
+                $(".size-picker").css("visibility", "hidden");
+                $(".text-picker").css("visibility", "hidden");
+                $("#font-picker").css("visibility", "hidden");
+            }
+            if ($(this).children().html() == " Fill Tool"){
+                currentTool = "fill";
+            }
+            if ($(this).children().html() == " Move Tool"){
+                currentTool = "move";
+            }
+        });
+
         $('#send').click(function(){
             socket.emit('chat-message', {'user':null, 'text':$('#chat-box').val()})
         })
