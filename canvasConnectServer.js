@@ -43,6 +43,7 @@ app.get('/', function (req, res) {
 
 // Serve login.html when /login is accessed
 app.get('/login', function (req, res) {
+  
     res.sendFile('login.html', {
         root: __dirname
     });
@@ -50,6 +51,9 @@ app.get('/login', function (req, res) {
 
 // Serve project_select.html when /project is accessed
 app.get('/project', function (req, res) {
+    if (!req.session.user){
+         res.redirect('/login');
+    }
     res.sendFile('project_select.html', {
         root: __dirname
     });
@@ -58,7 +62,7 @@ app.get('/project', function (req, res) {
 // Create a new sqlite3 database if none exist
 var db = new sqlite3.Database('cc.sqlite3');
 db.run("CREATE TABLE if not exists user (username TEXT PRIMARY KEY, password TEXT, email TEXT)");
-db.run("CREATE TABLE if not exists session (id INTEGER PRIMARY KEY AUTOINCREMENT, chathistory BLOB, settings BLOB, title TEXT, actions BLOB)");
+db.run("CREATE TABLE if not exists session (id INTEGER PRIMARY KEY AUTOINCREMENT, chathistory BLOB, settings BLOB, title TEXT, image BLOB)");
 db.run("CREATE TABLE if not exists user_session (username TEXT, session_id INTEGER)");
 
 
@@ -70,8 +74,12 @@ io.sockets.on('connection', function (socket) {
         var room = socket.handshake.session.room;
         socket.join(room);
         if (!(room in rooms)){
-            console.log("Room created: "+ room);
             rooms[room] = [];
+            db.get("SELECT id, title, image FROM session WHERE id = ? ",[room],function(err,row){
+                io.to(room).emit("restore", row.image);
+            });
+            console.log("Room created: "+ room);
+            
         }
         io.to(room).emit("actions", rooms[room]);
     });
@@ -153,6 +161,21 @@ io.sockets.on('connection', function (socket) {
         });
 
 
+    });
+    socket.on('save_canvas', function(data) {
+        var room = socket.handshake.session.room;
+        if (room){
+            if (room in rooms){
+                // Save the canvas contents to the database
+                var contents = data.imagedata;
+                db.run("UPDATE session SET image = ? WHERE id = ?",[contents,room],function(err){
+                    if (err){
+                        console.log("Error saving canvas");
+                    } 
+                });
+                
+            }
+        }
     });
 
 });

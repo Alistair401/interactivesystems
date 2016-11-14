@@ -11,13 +11,21 @@ $(function () {
         , win = $(window)
         , canvas = $('#main-canvas')
         , ctx = canvas[0].getContext('2d');
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+//    canvas.width = canvas.clientWidth;
+//    canvas.height = canvas.clientHeight;
     // A flag for drawing activity
     var active = false;
     var socket = io();
 
     socket.emit("load_actions");
+    socket.on("restore",function(base64){
+        var image = new Image();
+        image.src=base64;
+        image.onload = function(){
+            ctx.drawImage(image,0,0);
+        }
+             
+    });
     socket.on("actions",function(data){
         data.forEach(function(element){
             if(element.drawing){
@@ -36,7 +44,8 @@ $(function () {
                 if(element.action == "line"){
                     drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);
                 }
-        }});
+            }
+        });
     });
 
     socket.on('chat-message', function(data) {
@@ -184,8 +193,13 @@ $(function () {
         ctx.fillStyle = color;
         ctx.fillText(textInputVal, x, y - nav_height);
     }
+    
+    function saveCanvas(){
+        var image;
+        image = canvas.get(0).toDataURL('image/png');
+        socket.emit('save_canvas',{imagedata:image});
+    }
 
-    $(document).ready(function () {
         nav_height = $('nav').outerHeight();
         $(".thickness-picker").css("visibility", "visible");
         $(".color-picker").css("visibility", "visible");
@@ -252,7 +266,12 @@ $(function () {
             $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
             $('#chat-badge').css("top",(nav_height + 2)  + "px");
         });
-    });
+        
+        $('#save').click(function(){
+            console.log("Canvas saved");
+            saveCanvas();
+           
+        });
 
 });
 // chat panel javascript
