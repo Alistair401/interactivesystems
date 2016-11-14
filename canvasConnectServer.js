@@ -1,6 +1,6 @@
 var express = require('express');
 var path = require('path');
-var actions = [];
+
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
@@ -18,12 +18,16 @@ io.use(sharedsession(session, {
     autoSave: true
 }));
 
+// Store each room and its actions here to avoid constantly querying the database
+var rooms = {};
+
 // Serve static files from the public folder
 app.use(express.static('public'));
 
 app.get('/session/:slug', function (req, res) {
-    console.log(req.params.slug);
-    
+    console.log("User: " + req.session.user + " Joined room: " + req.params.slug);
+    req.session.room = req.params.slug;
+    req.session.save();
     res.redirect('/');
 });
 
@@ -51,30 +55,42 @@ app.get('/project', function (req, res) {
 // Create a new sqlite3 database if none exist
 var db = new sqlite3.Database('cc.sqlite3');
 db.run("CREATE TABLE if not exists user (username TEXT PRIMARY KEY, password TEXT, email TEXT)");
-db.run("CREATE TABLE if not exists session (id INTEGER PRIMARY KEY AUTOINCREMENT, chathistory BLOB, settings BLOB, title TEXT)");
+db.run("CREATE TABLE if not exists session (id INTEGER PRIMARY KEY AUTOINCREMENT, chathistory BLOB, settings BLOB, title TEXT, actions BLOB)");
 db.run("CREATE TABLE if not exists user_session (username TEXT, session_id INTEGER)");
 
 
-// Delete this row if you want to see debug messages
-//io.set('log level', 1);
-
 io.sockets.on('connection', function (socket) {
 
-    io.to(socket.id).emit("actions", actions);
-
+    
+    
+    socket.on('load_actions',function(){
+        var room = socket.handshake.session.room;
+        socket.join(room);
+        if (!(room in rooms)){
+            console.log("Room created: "+ room);
+            rooms[room] = [];
+        }
+        io.to(room).emit("actions", rooms[room]);
+    });
 
 
     socket.on('tool', function (data) {
-        if (data.drawing) {
-            actions.push(data);
+        var room = socket.handshake.session.room;
+        if (room){
+            if (data.drawing) {
+                rooms[room].push(data);
+            }
+        io.to(room).emit('moving', data);
         }
-        socket.broadcast.emit('moving', data);
     });
     socket.on('eraser', function (data) {
-        if (data.erasing) {
-            actions.push(data);
+        var room = socket.handshake.session.room;
+        if(room){
+            if (data.erasing) {
+                rooms[room].push(data);
+            }
         }
-        socket.broadcast.emit('eraser', data);
+        io.to(room).emit('eraser', data);
     });
     socket.on('register_user', function (data) {
         db.run(
@@ -104,8 +120,9 @@ io.sockets.on('connection', function (socket) {
 
     });
     socket.on('chat-message', function (data) {
-        io.emit('chat-message', data);
-    })
+        var room = socket.handshake.session.room;
+        io.to(room).emit('chat-message', data);
+    });
     socket.on('get_projects', function () {
         var sess = socket.handshake.session;
         db.all("SELECT * FROM session INNER JOIN user_session ON session.id = user_session.session_id WHERE username = '" + sess.user + "'", function (err, rows) {

@@ -17,7 +17,7 @@ $(function () {
     var active = false;
     var socket = io();
 
-
+    socket.emit("load_actions");
     socket.on("actions",function(data){
         data.forEach(function(element){
             if(element.drawing){
