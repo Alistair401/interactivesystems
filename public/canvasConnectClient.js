@@ -22,7 +22,7 @@ $(function () {
         data.forEach(function(element){
             if(element.drawing){
                 if(element.action == "pencil"){
-                drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);//,element.width);
+                    drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);//,element.width);
                 }
                 if(element.action == "paintbrush"){
                     drawCircle(element.x,element.y,element.width,element.color);
@@ -30,9 +30,15 @@ $(function () {
                 if(element.action == "eraser"){
                     eraseAt(element.x, element.y, element.width);
                 }
-
+                if(element.action == "text"){
+                    placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
+                }
+                if(element.action == "line"){
+                    drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);
+                }
         }});
     });
+
     socket.on('chat-message', function(data) {
         if (chat_open == false)
         {
@@ -50,8 +56,14 @@ $(function () {
             if(data.action == "paintbrush"){
                 drawCircle(data.x,data.y,data.width,data.color);
             }
-            if (data.action == "eraser"){
+            if(data.action == "eraser"){
                 eraseAt(data.x,data.y,data.width);
+            }
+            if(data.action == "text"){
+                placeText(data.x, data.y, data.textValue, data.color, data.size, data.font);
+            }
+            if(data.action == "line"){
+                drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);
             }
         }
     });
@@ -63,9 +75,42 @@ $(function () {
         prev.x = e.pageX;
         prev.y = e.pageY;
     });
-    canvas.bind('mouseup mouseleave', function () {
+    
+    canvas.bind('mouseup', function (e) {
+        var fontSel = document.getElementById('font-picker');
+        var fontSelValue = fontSel.options[fontSel.selectedIndex];
+        if (currentTool == "text"){
+            socket.emit('tool', {
+                'x': e.pageX
+                , 'y': e.pageY
+                , 'action' : currentTool
+                , 'drawing': active
+                , 'textValue': $('#text-input').val()
+                , 'color': $("#color-input").val()
+                , 'size' :  $("#size-input").val()
+                , 'font' : fontSelValue.text
+                , });
+            placeText(e.pageX, e.pageY, $('#text-input').val(), $("#color-input").val(), $("#size-input").val(), fontSelValue.text);
+        }
+        if (currentTool == "line"){
+            socket.emit('tool', {
+                'prev_x': prev.x
+                , 'prev_y': prev.y
+                , 'x': e.pageX
+                , 'y': e.pageY
+                , 'action' : currentTool
+                , 'drawing': active
+                , 'color': $("#color-input").val()
+                , });
+            drawLine(prev.x, prev.y, e.pageX, e.pageY, $("#color-input").val());
+        }
         active = false;
     });
+   
+    canvas.bind('mouseleave', function (e) {
+        active = false;
+    });
+
     canvas.on('mousemove', function (e) {
         var colorUsed;
 
@@ -73,17 +118,18 @@ $(function () {
             colorUsed = $("#color-input").val()
         }
 
-        socket.emit('tool', {
-            'prev_x': prev.x
-            , 'prev_y': prev.y
-            , 'x': e.pageX
-            , 'y': e.pageY
-            , 'action' : currentTool
-            , 'drawing': active
-            , 'color': colorUsed
-            , 'width': $("#thickness-input").val()
-            , });
-
+        if (currentTool != "text" && currentTool != "line"){
+            socket.emit('tool', {
+                'prev_x': prev.x
+                , 'prev_y': prev.y
+                , 'x': e.pageX
+                , 'y': e.pageY
+                , 'action' : currentTool
+                , 'drawing': active
+                , 'color': colorUsed
+                , 'width': $("#thickness-input").val()
+                , });
+        }
         if (active) {
             switch (currentTool) {
             case "pencil":
@@ -109,7 +155,6 @@ $(function () {
         ctx.moveTo(fromx, fromy - nav_height);
         ctx.lineTo(tox, toy - nav_height);
         ctx.strokeStyle = color;
-
         ctx.stroke();
     }
 
@@ -130,6 +175,16 @@ $(function () {
         ctx.closePath();
         ctx.globalCompositeOperation = 'source-over';
     }
+
+    function placeText(x, y, textInputVal, color, size, font){
+        size = size.concat("px ");
+        size = size.concat(font);
+        console.log(size);
+        ctx.font = size;
+        ctx.fillStyle = color;
+        ctx.fillText(textInputVal, x, y - nav_height);
+    }
+
     $(document).ready(function () {
         nav_height = $('nav').outerHeight();
         $(".thickness-picker").css("visibility", "visible");
@@ -141,18 +196,53 @@ $(function () {
                 currentTool = "pencil";
                 $(".color-picker").css("visibility", "visible");
                 $(".thickness-picker").css("visibility", "hidden");
+                $(".size-picker").css("visibility", "hidden");
+                $(".text-picker").css("visibility", "hidden");
+                $("#font-picker").css("visibility", "hidden");
             }
             if ($(this).val() == "paintbrush") {
                 currentTool = "paintbrush";
                 $(".color-picker").css("visibility", "visible");
                 $(".thickness-picker").css("visibility", "visible");
+                $(".size-picker").css("visibility", "hidden");
+                $(".text-picker").css("visibility", "hidden");
+                $("#font-picker").css("visibility", "hidden");
             }
             if ($(this).val() == "eraser") {
                 currentTool = "eraser";
                 $(".color-picker").css("visibility", "hidden");
                 $(".thickness-picker").css("visibility", "visible");
+                $(".size-picker").css("visibility", "hidden");
+                $(".text-picker").css("visibility", "hidden");
+                $("#font-picker").css("visibility", "hidden");
+            }
+            if ($(this).val() == "text") {
+                currentTool = "text";
+                $(".color-picker").css("visibility", "visible");
+                $(".thickness-picker").css("visibility", "hidden");
+                $(".size-picker").css("visibility", "visible");
+                $(".text-picker").css("visibility", "visible");
+                $("#font-picker").css("visibility", "visible");
             }
         });
+
+        $("#drop li a").click(function() {
+            if ($(this).children().html() == " Line Tool"){
+                currentTool = "line";
+                $(".color-picker").css("visibility", "visible");
+                $(".thickness-picker").css("visibility", "hidden");
+                $(".size-picker").css("visibility", "hidden");
+                $(".text-picker").css("visibility", "hidden");
+                $("#font-picker").css("visibility", "hidden");
+            }
+            if ($(this).children().html() == " Fill Tool"){
+                currentTool = "fill";
+            }
+            if ($(this).children().html() == " Move Tool"){
+                currentTool = "move";
+            }
+        });
+
         $('#send').click(function(){
             socket.emit('chat-message', {'user':null, 'text':$('#chat-box').val()})
         })
