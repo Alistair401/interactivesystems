@@ -22,10 +22,15 @@ $(document).ready(function () {
   });
 
   socket.on('register_fail', function () {
+      $('#register-fail').css("visibility","visible");
   });
   
   socket.on('login_success', function () {
       window.location.href = '/project';
+  });
+  
+  socket.on('login_failure',function(){
+    $('#login-fail').css("visibility","visible");
   });
 
 });

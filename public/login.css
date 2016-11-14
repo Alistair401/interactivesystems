@@ -8,6 +8,7 @@ body {
     display: flex;
     height: 100%;
     padding: 0;
+    flex-direction: column;
     margin: 0;
     align-items: center;
     justify-content: center;
@@ -42,4 +43,11 @@ body {
 .cust-grey-text{
     color: lightgray;
     font-size: 75%;
+}
+#register-fail{
+    visibility: hidden;
+}
+#login-fail{
+    visibility: hidden;
+    font-size: large;
 }
