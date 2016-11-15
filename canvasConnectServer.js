@@ -131,6 +131,7 @@ io.sockets.on('connection', function (socket) {
 
     });
     socket.on('chat-message', function (data) {
+        data.user = socket.handshake.session.user;
         var room = socket.handshake.session.room;
         io.to(room).emit('chat-message', data);
     });
