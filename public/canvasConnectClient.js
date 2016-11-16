@@ -21,6 +21,7 @@ $(function () {
     socket.on("restore",function(base64){
         var image = new Image();
         image.src=base64;
+        ctx.canvas.width = ctx.canvas.width;
         image.onload = function(){
             ctx.drawImage(image,0,0);
         }
@@ -165,6 +166,7 @@ $(function () {
         ctx.lineTo(tox, toy - nav_height);
         ctx.strokeStyle = color;
         ctx.stroke();
+        ctx.closePath();
     }
 
     function drawCircle(x,y,radius,color){
@@ -174,6 +176,7 @@ $(function () {
         ctx.fill();
         ctx.strokeStyle = color;
         ctx.stroke();
+        ctx.closePath();
     }
 
     function eraseAt(x, y, thickness) {
@@ -198,6 +201,15 @@ $(function () {
         var image;
         image = canvas.get(0).toDataURL('image/png');
         socket.emit('save_canvas',{imagedata:image});
+    }
+
+    //TODO
+    function clearCanvas(){
+
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.canvas.width = ctx.canvas.width;
+        var image = canvas.get(0).toDataURL("image/png");
+        socket.emit("clear-canvas",{imagedata:image});
     }
 
         nav_height = $('nav').outerHeight();
@@ -271,6 +283,11 @@ $(function () {
             console.log("Canvas saved");
             saveCanvas();
            
+        });
+
+        $("#clear").click(function(){
+            console.log("Clearing canvas");
+            clearCanvas();
         });
 
 });

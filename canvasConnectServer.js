@@ -179,6 +179,23 @@ io.sockets.on('connection', function (socket) {
         }
     });
 
+
+    socket.on("clear-canvas",function(data){
+        var room = socket.handshake.session.room;
+        if(room){
+            var contents = data.imagedata;
+            rooms[room] = [];
+            io.to(room).emit('restore', contents);     
+            db.run("UPDATE session SET image = ? WHERE id = ?",[contents,room],function(err){
+                if (err){
+                    console.log("Error saving canvas");
+                } 
+            });
+
+        }
+    });
+
+
 });
 
 
