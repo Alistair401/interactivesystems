@@ -272,6 +272,7 @@ $(function () {
                 $(".size-picker").css("visibility", "hidden");
                 $(".text-picker").css("visibility", "hidden");
                 $("#font-picker").css("visibility", "hidden");
+                $("#imgUploadLbl").css("visibility", "hidden");
             }
             if ($(this).val() == "paintbrush") {
                 currentTool = "paintbrush";
@@ -280,6 +281,7 @@ $(function () {
                 $(".size-picker").css("visibility", "hidden");
                 $(".text-picker").css("visibility", "hidden");
                 $("#font-picker").css("visibility", "hidden");
+                $("#imgUploadLbl").css("visibility", "hidden");
             }
             if ($(this).val() == "eraser") {
                 currentTool = "eraser";
@@ -288,6 +290,7 @@ $(function () {
                 $(".size-picker").css("visibility", "hidden");
                 $(".text-picker").css("visibility", "hidden");
                 $("#font-picker").css("visibility", "hidden");
+                $("#imgUploadLbl").css("visibility", "hidden");
             }
             if ($(this).val() == "text") {
                 currentTool = "text";
@@ -296,6 +299,7 @@ $(function () {
                 $(".size-picker").css("visibility", "visible");
                 $(".text-picker").css("visibility", "visible");
                 $("#font-picker").css("visibility", "visible");
+                $("#imgUploadLbl").css("visibility", "hidden");
             }
         });
 
@@ -307,6 +311,7 @@ $(function () {
                 $(".size-picker").css("visibility", "hidden");
                 $(".text-picker").css("visibility", "hidden");
                 $("#font-picker").css("visibility", "hidden");
+                $("#imgUploadLbl").css("visibility", "hidden");
             }
             if ($(this).children().html() == " Import Image"){
                 currentTool = "import";
@@ -315,6 +320,7 @@ $(function () {
                 $(".size-picker").css("visibility", "hidden");
                 $(".text-picker").css("visibility", "hidden");
                 $("#font-picker").css("visibility", "hidden");
+                $("#imgUploadLbl").css("visibility", "visible");
             }
             if ($(this).children().html() == " Move Tool"){
                 currentTool = "move";
