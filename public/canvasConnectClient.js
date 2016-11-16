@@ -16,6 +16,7 @@ $(function () {
     // A flag for drawing activity
     var active = false;
     var socket = io();
+    var img;
 
     socket.emit("load_actions");
     socket.on("restore",function(base64){
@@ -53,6 +54,9 @@ $(function () {
                     if(element.action == "line"){
                         drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);
                     }
+                    if(element.action == "import"){
+                        ctx.drawImage(element.img, element.x-10, element.y-88, 900, 900);
+                    }
                 }
             });
     }
@@ -83,6 +87,13 @@ $(function () {
             if(data.action == "line"){
                 drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);
             }
+            if(data.action == "import"){
+                img = document.createElement("img");
+                img.innerHTML = '<img src="#" alt="Imported image" width="220" height="277"/>';
+                img.id = 'importImg';
+                img.src = data.src;
+                ctx.drawImage(img, data.x-10, data.y-88, 200, 200);
+            }
         }
     });
 
@@ -92,6 +103,16 @@ $(function () {
         active = true;
         prev.x = e.pageX;
         prev.y = e.pageY;
+        if (currentTool == "import"){
+            socket.emit('tool', {
+                'x': e.pageX
+                , 'y': e.pageY
+                , 'action' : currentTool
+                , 'drawing': active
+                , 'src': img.src
+                , });
+            ctx.drawImage(img, e.pageX-10, e.pageY-88, 200, 200); 
+        }
     });
     
     canvas.bind('mouseup', function (e) {
@@ -136,7 +157,7 @@ $(function () {
             colorUsed = $("#color-input").val()
         }
 
-        if (currentTool != "text" && currentTool != "line"){
+        if (currentTool != "text" && currentTool != "line" && currentTool != "import"){
             socket.emit('tool', {
                 'prev_x': prev.x
                 , 'prev_y': prev.y
@@ -211,6 +232,24 @@ $(function () {
         socket.emit('save_canvas',{imagedata:image});
     }
 
+    function importImg(input) {
+        if (input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                img = document.createElement("img");
+                img.innerHTML = '<img src="#" alt="Imported image" width="220" height="277"/>';
+                img.id = 'importImg';
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $("#imgUpload").change(function () {
+        importImg(this);
+    });
+
     //TODO
     function clearCanvas(){
 
@@ -269,8 +308,13 @@ $(function () {
                 $(".text-picker").css("visibility", "hidden");
                 $("#font-picker").css("visibility", "hidden");
             }
-            if ($(this).children().html() == " Fill Tool"){
-                currentTool = "fill";
+            if ($(this).children().html() == " Import Image"){
+                currentTool = "import";
+                $(".color-picker").css("visibility", "hidden");
+                $(".thickness-picker").css("visibility", "hidden");
+                $(".size-picker").css("visibility", "hidden");
+                $(".text-picker").css("visibility", "hidden");
+                $("#font-picker").css("visibility", "hidden");
             }
             if ($(this).children().html() == " Move Tool"){
                 currentTool = "move";
