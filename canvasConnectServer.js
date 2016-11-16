@@ -73,15 +73,14 @@ io.sockets.on('connection', function (socket) {
     socket.on('load_actions',function(){
         var room = socket.handshake.session.room;
         socket.join(room);
-        if (!(room in rooms)){
+        if(!(room in rooms)){
             rooms[room] = [];
-            db.get("SELECT id, title, image FROM session WHERE id = ? ",[room],function(err,row){
-                io.to(room).emit("restore", row.image);
-            });
-            console.log("Room created: "+ room);
-            
         }
-        io.to(room).emit("actions", rooms[room]);
+        db.get("SELECT id, title, image FROM session WHERE id = ? ",[room],function(err,row){
+            io.to(room).emit("restore", {"image":row.image,"actions":rooms[room]});
+        });
+        console.log("Room created: "+ room);        
+        //io.to(room).emit("actions", rooms[room]);
     });
 
 

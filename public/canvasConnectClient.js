@@ -20,34 +20,42 @@ $(function () {
     socket.emit("load_actions");
     socket.on("restore",function(base64){
         var image = new Image();
-        image.src=base64;
+        image.src=base64.image;
         ctx.canvas.width = ctx.canvas.width;
         image.onload = function(){
             ctx.drawImage(image,0,0);
         }
+        drawData(base64.actions);
+
+
              
     });
     socket.on("actions",function(data){
-        data.forEach(function(element){
-            if(element.drawing){
-                if(element.action == "pencil"){
-                    drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);//,element.width);
-                }
-                if(element.action == "paintbrush"){
-                    drawCircle(element.x,element.y,element.width,element.color);
-                }
-                if(element.action == "eraser"){
-                    eraseAt(element.x, element.y, element.width);
-                }
-                if(element.action == "text"){
-                    placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
-                }
-                if(element.action == "line"){
-                    drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);
-                }
-            }
-        });
+        drawData(data);
     });
+
+
+        function drawData(data){//,width) {
+            data.forEach(function(element){
+                if(element.drawing){
+                    if(element.action == "pencil"){
+                        drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);//,element.width);
+                    }
+                    if(element.action == "paintbrush"){
+                        drawCircle(element.x,element.y,element.width,element.color);
+                    }
+                    if(element.action == "eraser"){
+                        eraseAt(element.x, element.y, element.width);
+                    }
+                    if(element.action == "text"){
+                        placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
+                    }
+                    if(element.action == "line"){
+                        drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);
+                    }
+                }
+            });
+    }
 
     socket.on('chat-message', function(data) {
         if (chat_open == false)
