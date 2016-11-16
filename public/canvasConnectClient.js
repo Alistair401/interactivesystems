@@ -29,7 +29,7 @@ $(function () {
         drawData(base64.actions);
 
 
-             
+
     });
     socket.on("actions",function(data){
         drawData(data);
@@ -40,7 +40,7 @@ $(function () {
             data.forEach(function(element){
                 if(element.drawing){
                     if(element.action == "pencil"){
-                        drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);//,element.width);
+                        drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color, 1);
                     }
                     if(element.action == "paintbrush"){
                         drawCircle(element.x,element.y,element.width,element.color);
@@ -52,7 +52,7 @@ $(function () {
                         placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
                     }
                     if(element.action == "line"){
-                        drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color);
+                        drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color, element.width);
                     }
                     if(element.action == "import"){
                         ctx.drawImage(element.img, element.x-10, element.y-88, 900, 900);
@@ -73,7 +73,7 @@ $(function () {
     socket.on('moving', function (data) {
         if (data.drawing) {
             if(data.action == "pencil"){
-                drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);//,data.width);
+                drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color, 1);
             }
             if(data.action == "paintbrush"){
                 drawCircle(data.x,data.y,data.width,data.color);
@@ -85,7 +85,7 @@ $(function () {
                 placeText(data.x, data.y, data.textValue, data.color, data.size, data.font);
             }
             if(data.action == "line"){
-                drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color);
+                drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color, data.width);
             }
             if(data.action == "import"){
                 img = document.createElement("img");
@@ -111,10 +111,10 @@ $(function () {
                 , 'drawing': active
                 , 'src': img.src
                 , });
-            ctx.drawImage(img, e.pageX-10, e.pageY-88, 200, 200); 
+            ctx.drawImage(img, e.pageX-10, e.pageY-88, 200, 200);
         }
     });
-    
+
     canvas.bind('mouseup', function (e) {
         var fontSel = document.getElementById('font-picker');
         var fontSelValue = fontSel.options[fontSel.selectedIndex];
@@ -140,12 +140,13 @@ $(function () {
                 , 'action' : currentTool
                 , 'drawing': active
                 , 'color': $("#color-input").val()
+                , 'width': $("#thickness-input").val()
                 , });
-            drawLine(prev.x, prev.y, e.pageX, e.pageY, $("#color-input").val());
+            drawLine(prev.x, prev.y, e.pageX, e.pageY, $("#color-input").val(), $("#thickness-input").val());
         }
         active = false;
     });
-   
+
     canvas.bind('mouseleave', function (e) {
         active = false;
     });
@@ -172,7 +173,7 @@ $(function () {
         if (active) {
             switch (currentTool) {
             case "pencil":
-                drawLine(prev.x, prev.y, e.pageX, e.pageY, $("#color-input").val());//,$("#thickness-input").val());
+                drawLine(prev.x, prev.y, e.pageX, e.pageY, $("#color-input").val(), 1);//,$("#thickness-input").val());
                 prev.x = e.pageX;
                 prev.y = e.pageY;
                 break;
@@ -189,11 +190,12 @@ $(function () {
         }
     });
 
-    function drawLine(fromx, fromy, tox, toy, color){//,width) {
+    function drawLine(fromx, fromy, tox, toy, color, width){
         ctx.beginPath();
         ctx.moveTo(fromx, fromy - nav_height);
         ctx.lineTo(tox, toy - nav_height);
         ctx.strokeStyle = color;
+        ctx.lineWidth = width;
         ctx.stroke();
         ctx.closePath();
     }
@@ -225,7 +227,7 @@ $(function () {
         ctx.fillStyle = color;
         ctx.fillText(textInputVal, x, y - nav_height);
     }
-    
+
     function saveCanvas(){
         var image;
         image = canvas.get(0).toDataURL('image/png');
@@ -267,59 +269,40 @@ $(function () {
         $(".btn").click(function () {
             if ($(this).val() == "pencil") {
                 currentTool = "pencil";
+                setButtonsDefault()
                 $(".color-picker").css("visibility", "visible");
-                $(".thickness-picker").css("visibility", "hidden");
-                $(".size-picker").css("visibility", "hidden");
-                $(".text-picker").css("visibility", "hidden");
-                $("#font-picker").css("visibility", "hidden");
-                $("#imgUploadLbl").css("visibility", "hidden");
             }
             if ($(this).val() == "paintbrush") {
                 currentTool = "paintbrush";
+                setButtonsDefault()
                 $(".color-picker").css("visibility", "visible");
                 $(".thickness-picker").css("visibility", "visible");
-                $(".size-picker").css("visibility", "hidden");
-                $(".text-picker").css("visibility", "hidden");
-                $("#font-picker").css("visibility", "hidden");
-                $("#imgUploadLbl").css("visibility", "hidden");
             }
             if ($(this).val() == "eraser") {
                 currentTool = "eraser";
-                $(".color-picker").css("visibility", "hidden");
+                setButtonsDefault()
                 $(".thickness-picker").css("visibility", "visible");
-                $(".size-picker").css("visibility", "hidden");
-                $(".text-picker").css("visibility", "hidden");
-                $("#font-picker").css("visibility", "hidden");
-                $("#imgUploadLbl").css("visibility", "hidden");
             }
             if ($(this).val() == "text") {
                 currentTool = "text";
+                setButtonsDefault()
                 $(".color-picker").css("visibility", "visible");
-                $(".thickness-picker").css("visibility", "hidden");
                 $(".size-picker").css("visibility", "visible");
                 $(".text-picker").css("visibility", "visible");
                 $("#font-picker").css("visibility", "visible");
-                $("#imgUploadLbl").css("visibility", "hidden");
             }
         });
 
         $("#drop li a").click(function() {
             if ($(this).children().html() == " Line Tool"){
                 currentTool = "line";
+                setButtonsDefault()
                 $(".color-picker").css("visibility", "visible");
-                $(".thickness-picker").css("visibility", "hidden");
-                $(".size-picker").css("visibility", "hidden");
-                $(".text-picker").css("visibility", "hidden");
-                $("#font-picker").css("visibility", "hidden");
-                $("#imgUploadLbl").css("visibility", "hidden");
+                $(".thickness-picker").css("visibility", "visible");
             }
             if ($(this).children().html() == " Import Image"){
                 currentTool = "import";
-                $(".color-picker").css("visibility", "hidden");
-                $(".thickness-picker").css("visibility", "hidden");
-                $(".size-picker").css("visibility", "hidden");
-                $(".text-picker").css("visibility", "hidden");
-                $("#font-picker").css("visibility", "hidden");
+                setButtonsDefault()
                 $("#imgUploadLbl").css("visibility", "visible");
             }
             if ($(this).children().html() == " Move Tool"){
@@ -336,20 +319,32 @@ $(function () {
             $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
             $('#chat-badge').css("top",(nav_height + 2)  + "px");
         });
-        
+
         $('#save').click(function(){
             console.log("Canvas saved");
             saveCanvas();
-           
+
         });
 
         $("#clear").click(function(){
             console.log("Clearing canvas");
             clearCanvas();
         });
+        $(document).ready(function(){
+            setButtonsDefault();
+        })
 
 });
 // chat panel javascript
+function setButtonsDefault()
+{
+    $(".color-picker").css("visibility", "hidden");
+    $(".thickness-picker").css("visibility", "hidden");
+    $(".size-picker").css("visibility", "hidden");
+    $(".text-picker").css("visibility", "hidden");
+    $("#font-picker").css("visibility", "hidden");
+    $("#imgUploadLbl").css("visibility", "hidden");
+}
 function toggleChat() {
     if (chat_open == false) {
         document.getElementById("chat-panel").style.width = "245px";
@@ -361,8 +356,8 @@ function toggleChat() {
     else {
         document.getElementById("chat-panel").style.width = "15px";
         chat_open = false;
-        
-        
+
+
     }
 }
 function drawNumMessages() {
