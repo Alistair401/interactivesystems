@@ -59,7 +59,8 @@ $(function () {
                         ctx.drawImage(element.img, element.x-10, element.y-88, 900, 900);
                     }
                     if(element.action == "symbol"){
-                        placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
+                        var localSymbol = element.textValue;
+                        placeText(element.x, element.y, localSymbol, element.color, element.size, element.font);
                     }
                 }
             });
@@ -99,7 +100,8 @@ $(function () {
                 ctx.drawImage(img, data.x-10, data.y-88, 200, 200);
             }
             if(data.action == "symbol"){
-                placeText(data.x, data.y, data.textValue, data.color, data.size, data.font )
+                var localSymbol = data.textValue;
+                placeText(data.x, data.y, localSymbol, data.color, data.size, data.font )
             }
         }
     });
@@ -149,7 +151,8 @@ $(function () {
                 , 'color' : $('#symbol-color-input').val()
                 , 'font' : 'serif'
                 , });
-            placeText(e.pageX, e.pageY, symbol, $('#symbol-color-input').val(), $("#symbol-size-input").val(), 'serif');
+            var localSymbol = symbol;
+            placeText(e.pageX, e.pageY, localSymbol, $('#symbol-color-input').val(), $("#symbol-size-input").val(), 'serif');
         }
         if (currentTool == "line"){
             socket.emit('tool', {
@@ -240,6 +243,7 @@ $(function () {
     }
 
     function placeText(x, y, textInputVal, color, size, font){
+
         size = size.concat("px ");
         size = size.concat(font);
         console.log(size);
@@ -352,9 +356,11 @@ $(function () {
         $('#save').click(function(){
             console.log("Canvas saved");
             saveCanvas();
-
         });
-
+        $('#export').click(function(){
+            this.href = canvas[0].toDataURL();
+            this.download = "whiteboard.png";
+        })
         $("#clear").click(function(){
             console.log("Clearing canvas");
             clearCanvas();
