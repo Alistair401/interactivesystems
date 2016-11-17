@@ -43,7 +43,10 @@ $(function () {
                     eraseAt(element.x, element.y, element.width);
                 }
                 if(element.action == "text"){
-                    placeText(10, element.y + element.previousTextSize, element.textValue, element.color, element.size, element.font);
+                    /* placeText(10, element.y + element.previousTextSize, element.textValue, element.color, element.size, element.font); */
+
+                    placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
+
                 }
                 if(element.action == "line"){
                     drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color, element.width);
@@ -56,7 +59,7 @@ $(function () {
                 }
                 if(element.action == "clear"){
                     console.log("Canvas cleared from load")
-                    ctx.clearRect(0,0,1920,1080);
+                    ctx.clearRect(0,0,canvas.get(0).width,canvas.get(0).height);
                 }
                 
 
@@ -80,11 +83,6 @@ $(function () {
         drawData(data);
     })
 
-    socket.on("clearCanvas1",function(data){
-        console.log("Canvas cleared");
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.canvas.width = ctx.canvas.width;
-    });
 
     socket.on('moving', function (data) {
         if (data.drawing) {
@@ -98,8 +96,10 @@ $(function () {
                 eraseAt(data.x,data.y,data.width);
             }
             if(data.action == "text"){
-                ctx.clearRect(10, data.previousTextSize, ctx.measureText(data.previousText).width, data.previousTextSize + data.parsedSize);
-                placeText(10, data.y + data.previousTextSize, data.textValue, data.color, data.size, data.font);
+                placeText(data.x, data.y, data.textValue, data.color, data.size, data.font);
+
+                /* ctx.clearRect(10, data.previousTextSize, ctx.measureText(data.previousText).width, data.previousTextSize + data.parsedSize);
+                placeText(10, data.y + data.previousTextSize, data.textValue, data.color, data.size, data.font); */
             }
             if(data.action == "line"){
                 drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color, data.width);
@@ -172,6 +172,20 @@ $(function () {
                 , });
             drawLine(prev.x, prev.y, e.pageX, e.pageY, $("#color-input").val(), $("#thickness-input").val());
         }
+        if (currentTool == "text"){
+            socket.emit('tool', {
+            'x': e.pageX
+            , 'y': e.pageY
+            , 'action' : currentTool
+            , 'drawing': active
+            , 'textValue': $('#text-input').val()
+            , 'color': $("#color-input").val()
+            , 'size' :  $("#size-input").val()
+            , 'font' : fontSelValue.text
+            , });
+            placeText(e.pageX, e.pageY, $('#text-input').val(), $("#color-input").val(), $("#size-input").val(), fontSelValue.text);
+        }
+
         active = false;
     });
 
@@ -217,8 +231,8 @@ $(function () {
             //END NEW
         }
     });
-
-    var lineStack = new Array();
+    
+    /* var lineStack = new Array();
     var previousText = $('#text-input').val();
     var previousTextSize = 0;//parseInt(ctx.font);
     $('#text-input').keyup(function(e){
@@ -253,7 +267,7 @@ $(function () {
                     document.getElementById('text-input').value = "";
             }
         }
-    });
+    }); */
 
     function drawLine(fromx, fromy, tox, toy, color, width){
         ctx.beginPath();
@@ -328,7 +342,7 @@ $(function () {
     });
 
     function clearCanvas(){
-        ctx.clearRect(0,0,1920,1080);
+        ctx.clearRect(0,0,canvas.get(0).width,canvas.get(0).height);
         socket.emit('tool', {
             'action' : "clear"
             , 'drawing': true
