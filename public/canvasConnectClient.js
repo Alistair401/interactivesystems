@@ -1,4 +1,5 @@
 var currentTool = null;
+var symbol = null;
 var messages = 0;
 var chat_open = false;
 var nav_height;
@@ -57,6 +58,9 @@ $(function () {
                     if(element.action == "import"){
                         ctx.drawImage(element.img, element.x-10, element.y-88, 900, 900);
                     }
+                    if(element.action == "symbol"){
+                        placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
+                    }
                 }
             });
     }
@@ -94,6 +98,9 @@ $(function () {
                 img.src = data.src;
                 ctx.drawImage(img, data.x-10, data.y-88, 200, 200);
             }
+            if(data.action == "symbol"){
+                placeText(data.x, data.y, data.textValue, data.color, data.size, data.font )
+            }
         }
     });
 
@@ -130,6 +137,19 @@ $(function () {
                 , 'font' : fontSelValue.text
                 , });
             placeText(e.pageX, e.pageY, $('#text-input').val(), $("#color-input").val(), $("#size-input").val(), fontSelValue.text);
+        }
+        if (currentTool == "symbol" && symbol != null){
+            socket.emit('tool', {
+                'x': e.pageX
+                , 'y': e.pageY
+                , 'action' : currentTool
+                , 'drawing': active
+                , 'textValue': symbol
+                , 'size' :  $("#symbol-size-input").val()
+                , 'color' : $('#symbol-color-input').val()
+                , 'font' : 'serif'
+                , });
+            placeText(e.pageX, e.pageY, symbol, $('#symbol-color-input').val(), $("#symbol-size-input").val(), 'serif');
         }
         if (currentTool == "line"){
             socket.emit('tool', {
@@ -293,6 +313,10 @@ $(function () {
             }
         });
 
+        $('.symbol').click(function(){
+            symbol = $(this).text();
+        })
+
         $("#drop li a").click(function() {
             if ($(this).children().html() == " Line Tool"){
                 currentTool = "line";
@@ -302,11 +326,16 @@ $(function () {
             }
             if ($(this).children().html() == " Import Image"){
                 currentTool = "import";
-                setButtonsDefault()
+                setButtonsDefault();
                 $("#imgUploadLbl").css("visibility", "visible");
             }
             if ($(this).children().html() == " Move Tool"){
                 currentTool = "move";
+            }
+            if ($(this).children().html() == " Symbol Tool"){
+                currentTool = "symbol";
+                $(".standard-tool-menu").css("display", "none");
+                $(".symbol-tool-menu").css("display", "inline");
             }
         });
 
@@ -338,6 +367,8 @@ $(function () {
 // chat panel javascript
 function setButtonsDefault()
 {
+    $(".standard-tool-menu").css("display", "inline");
+    $(".symbol-tool-menu").css("display", "none");
     $(".color-picker").css("visibility", "hidden");
     $(".thickness-picker").css("visibility", "hidden");
     $(".size-picker").css("visibility", "hidden");

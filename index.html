@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
     <!-- JQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <!-- Latest compiled and minified CSS -->
@@ -35,9 +36,10 @@
                             <li value="line"><a><i class="fa fa-long-arrow-up" aria-hidden="true"> Line Tool</i></a></li>
                             <li value="import"><a><i class="fa fa-plus-square-o" aria-hidden="true"> Import Image</i></a></li>
                             <li value="move"><a><i class="fa fa-arrows" aria-hidden="true"> Move Tool</i></a></li>
+                            <li value="symbol"><a><i class="fa fa-superscript" aria-hidden="true"> Symbol Tool</i></a></li>
                         </ul>
                     </div>
-                    <div class="tool-menu">
+                    <div class="standard-tool-menu">
                         <label class="color-picker">Colour:
                             <input type='color' class="cust-input-format" id='color-input' /> </label>
                         <div class="thickness-picker">
@@ -51,14 +53,28 @@
                         <label class="size-picker">Size:
                             <input type='number' class="form-control" id='size-input' /> </label>
                         <div class="form-group">
-                          <select class="form-control" id="font-picker">
-                            <option value="American text">American text</option>
-                            <option value="Arial">Arial</option>
-                            <option value="Calibri">Calibri</option>
-                          </select>
+                            <select class="form-control" id="font-picker">
+                                <option value="American text">American text</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Calibri">Calibri</option>
+                            </select>
                         </div>
                         <input class="hidden" type='file' id="imgUpload" />
                         <label id="imgUploadLbl" class="form-control" for="imgUpload">Select file</label>
+                    </div>
+                    <div class="symbol-tool-menu">
+                        <label class="btn symbol">&times;</label>
+                        <label class="btn symbol">&divide;</label>
+                        <label class="btn symbol">&pi;</label>
+                        <label class="btn symbol">&alpha;</label>
+                        <label class="btn symbol">&beta;</label>
+                        <label class="btn symbol">&Delta;</label>
+                        <label class="btn symbol">&Lambda;</label>
+                        <label class="btn symbol">&gamma;</label>
+                        <label class="symbol-size-picker">Size:
+                            <input type='number' class="form-control" id='symbol-size-input' /> </label>
+                        <label class="symbol-color-picker">Colour:
+                            <input type='color' class="cust-input-format" id='symbol-color-input' /> </label>
                     </div>
                     <ul class="nav navbar-nav navbar-right">
                         <div class="btn-group">
