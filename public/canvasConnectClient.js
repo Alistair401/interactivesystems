@@ -20,23 +20,13 @@ $(function () {
     var img;
 
     socket.emit("load_actions");
-    socket.on("restore",function(base64){
-        var image = new Image();
-        image.src=base64.image;
-        ctx.canvas.width = ctx.canvas.width;
-        image.onload = function(){
-            ctx.drawImage(image,0,0);
-        }
-        drawData(base64.actions);
 
-
-
-    });
     socket.on("actions",function(data){
         drawData(data);
     });
 
 
+<<<<<<< HEAD
         function drawData(data){//,width) {
             data.forEach(function(element){
                 if(element.drawing){
@@ -63,7 +53,20 @@ $(function () {
                         placeText(element.x, element.y, localSymbol, element.color, element.size, element.font);
                     }
                 }
-            });
+                if(element.action == "line"){
+                    drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color, element.width);
+                }
+                if(element.action == "import"){
+                    ctx.drawImage(element.img, element.x-10, element.y-88, 900, 900);
+                }
+                if(element.action == "saveData"){
+                    drawSaveData(element.src);
+                }
+                if(element.action == "symbol"){
+                    placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
+                }
+            }
+        });
     }
 
     socket.on('chat-message', function(data) {
@@ -269,6 +272,16 @@ $(function () {
                 img.src = e.target.result;
             }
             reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function drawSaveData(base64){
+        var image = new Image();
+        image.src=base64;
+        console.log(image);
+        ctx.canvas.width = ctx.canvas.width;
+        image.onload = function(){
+            ctx.drawImage(image,0,0);
         }
     }
 
