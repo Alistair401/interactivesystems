@@ -73,17 +73,19 @@ io.sockets.on('connection', function (socket) {
     socket.on('load_actions',function(){
         var room = socket.handshake.session.room;
         socket.join(room);
-        if(!(room in rooms)){
-            console.log("Room created: "+ room);   
-            rooms[room] = [];
-            db.get("SELECT id, title, image FROM session WHERE id = ? ",[room],function(err,row){
-                rooms[room].push({action : 'saveData', src: row.image, drawing: true})
-                io.to(room).emit("actions", rooms[room]);
-                return;
-            });
-        }
-        io.to(room).emit("actions", rooms[room]);
+        db.get("SELECT id, title, image FROM session WHERE id = ? ",[room],function(err,row){
+            var saveData;
+            if(!(room in rooms)){
+                console.log("Room created: "+ room);   
+                rooms[room] = [];
+            }
+            saveData = {src: row.image}
+            io.to(room).emit("actions", {actions: rooms[room], save: saveData});
+            
+        });
         
+        
+
     });
 
 

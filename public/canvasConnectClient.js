@@ -22,7 +22,13 @@ $(function () {
     socket.emit("load_actions");
     
     socket.on("actions",function(data){
-        drawData(data);
+        function callback(){
+            drawData(data.actions);
+        }
+        if (data.save){
+            drawSaveData(data.save.src,callback);
+        }
+        
     });
 
 
@@ -46,9 +52,6 @@ $(function () {
                 }
                 if(element.action == "import"){
                     ctx.drawImage(element.img, element.x-10, element.y-88, 900, 900);
-                }
-                if(element.action == "saveData"){
-                    drawSaveData(element.src);
                 }
                 if(element.action == "symbol"){
                     placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
@@ -234,7 +237,6 @@ $(function () {
     function placeText(x, y, textInputVal, color, size, font){
         size = size.concat("px ");
         size = size.concat(font);
-        console.log(size);
         ctx.font = size;
         ctx.fillStyle = color;
         ctx.fillText(textInputVal, x, y - nav_height);
@@ -260,14 +262,14 @@ $(function () {
         }
     }
     
-    function drawSaveData(base64){
+    function drawSaveData(base64,callback){
         var image = new Image();
         image.src=base64;
-        console.log(image);
-        ctx.canvas.width = ctx.canvas.width;
         image.onload = function(){
             ctx.drawImage(image,0,0);
+            callback();
         }
+        
     }
 
     $("#imgUpload").change(function () {
