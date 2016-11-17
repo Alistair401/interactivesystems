@@ -111,3 +111,13 @@ body {
     right: 17px;
     visibility: hidden;
 }
+.standard-tool-menu{
+    display:inline;
+}
+.symbol-tool-menu{
+    display:none;
+}
+.symbol{
+    margin-left: 10px;
+    font-size: 25px;
+}
