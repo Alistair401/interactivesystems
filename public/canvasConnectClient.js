@@ -72,6 +72,11 @@ $(function () {
     });
 
 
+    socket.on("clearing",function(data){
+        console.log(data);
+        drawData(data);
+    })
+
     socket.on("clearCanvas1",function(data){
         console.log("Canvas cleared");
         ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -322,10 +327,10 @@ $(function () {
     //TODO
     function clearCanvas(){
 
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.canvas.width = ctx.canvas.width;
-        var image = canvas.get(0).toDataURL("image/png");
-        socket.emit("clear-canvas",{imagedata:image});
+        //ctx.clearRect(0,0,canvas.width,canvas.height);
+        //ctx.canvas.width = ctx.canvas.width;
+        //var image = canvas.get(0).toDataURL("image/png");
+        socket.emit("clear-canvas",{});//{imagedata:image});
     }
 
         nav_height = $('nav').outerHeight();
