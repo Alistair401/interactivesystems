@@ -18,16 +18,43 @@ io.use(sharedsession(session, {
     autoSave: true
 }));
 
+// Create a new sqlite3 database if none exist
+var db = new sqlite3.Database('cc.sqlite3');
+db.run("CREATE TABLE if not exists user (username TEXT PRIMARY KEY, password TEXT, email TEXT)");
+db.run("CREATE TABLE if not exists session (id INTEGER PRIMARY KEY AUTOINCREMENT, chathistory BLOB, settings BLOB, title TEXT, image BLOB)");
+db.run("CREATE TABLE if not exists user_session (username TEXT, session_id INTEGER)");
+
 // Store each room and its actions here to avoid constantly querying the database
 var rooms = {};
 
+// Invite keys
+var keys = {};
+var lastKey = 0;
 // Serve static files from the public folder
 app.use(express.static('public'));
 
 app.get('/session/:slug', function (req, res) {
+    if (!req.session.user){
+        res.redirect('/login');
+    }
     console.log("User: " + req.session.user + " Joined room: " + req.params.slug);
     req.session.room = req.params.slug;
     req.session.save();
+    res.redirect('/');
+});
+
+app.get('/join/:slug', function (req, res) {
+    var sess = req.session;
+    if (!sess.user){
+        res.redirect('/login');
+    }
+    var key = req.params.slug;
+    if (key in keys){
+        console.log("User: " + sess.user + " Joined project: " + keys[key]);
+        sess.room = keys[key];
+        sess.save();
+        db.run("INSERT INTO user_session (username, session_id) VALUES ( ? , ? )", [sess.user,keys[key]]);
+    }
     res.redirect('/');
 });
 
@@ -59,11 +86,7 @@ app.get('/project', function (req, res) {
     });
 });
 
-// Create a new sqlite3 database if none exist
-var db = new sqlite3.Database('cc.sqlite3');
-db.run("CREATE TABLE if not exists user (username TEXT PRIMARY KEY, password TEXT, email TEXT)");
-db.run("CREATE TABLE if not exists session (id INTEGER PRIMARY KEY AUTOINCREMENT, chathistory BLOB, settings BLOB, title TEXT, image BLOB)");
-db.run("CREATE TABLE if not exists user_session (username TEXT, session_id INTEGER)");
+
 
 
 io.sockets.on('connection', function (socket) {
@@ -88,7 +111,13 @@ io.sockets.on('connection', function (socket) {
 
     });
 
-
+    socket.on("get_invite_key",function(){
+        var room = socket.handshake.session.room;
+        keys[lastKey] = room;
+        socket.emit('rec_invite_key',lastKey);
+        lastKey++;
+    });
+    
     socket.on('tool', function (data) {
         var room = socket.handshake.session.room;
         if (room){

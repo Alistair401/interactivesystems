@@ -17,6 +17,8 @@
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <!-- Socket.io -->
     <script src="/socket.io/socket.io.js"></script>
+    <!-- Clipboard -->
+    <script src="dist/clipboard.min.js"></script>
 </head>
 
 <body>
@@ -84,6 +86,7 @@
                                 <li><a>Import</a></li>
                                 <li><a id="export" class="export-btn">Export</a></li>
                                 <li><a id="clear" class="clear-btn">Clear</a></li>
+                                <li id="invite"><a>Invite</a></li>
                             </ul>
                         </div>
                     </ul>
@@ -112,6 +115,15 @@
         </div>
     </div>
     <div id="chat-badge" ><span id="num-messages" class="badge">0</span></div>
+    <div class="modal fade" id="invite-modal" tabindex="-1" role="dialog" aria-labelledby="inviteLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="projectLabel">Invite link: /join/<span id="invite-key"></span></h4> </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

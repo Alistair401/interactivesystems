@@ -4,6 +4,7 @@ var messages = 0;
 var chat_open = false;
 var nav_height;
 $(function () {
+    
     if (!('getContext' in document.createElement('canvas'))) {
         alert('Sorry, it looks like your browser does not support canvas!');
         return false;
@@ -290,8 +291,6 @@ $(function () {
     }
 
         nav_height = $('nav').outerHeight();
-        $(".thickness-picker").css("visibility", "visible");
-        $(".color-picker").css("visibility", "visible");
         $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
         $('#chat-badge').css("top",(nav_height + 2) + "px");
         $(".btn").click(function () {
@@ -323,7 +322,7 @@ $(function () {
 
         $('.symbol').click(function(){
             symbol = $(this).text();
-        })
+        });
 
         $("#drop li a").click(function() {
             if ($(this).children().html() == " Line Tool"){
@@ -369,9 +368,15 @@ $(function () {
             console.log("Clearing canvas");
             clearCanvas();
         });
-        $(document).ready(function(){
-            setButtonsDefault();
-        })
+        $("#invite").click(function(){
+            socket.emit("get_invite_key");
+        });
+            
+        socket.on("rec_invite_key",function(key){
+            $('#invite-key').html(key);
+            $('#invite-modal').modal('show');
+        });
+        setButtonsDefault();
 
 });
 // chat panel javascript
