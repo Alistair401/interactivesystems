@@ -173,7 +173,7 @@ $(function () {
     canvas.on('mousemove', function (e) {
         var colorUsed;
 
-        if(currentTool == "paintbrush"){
+        if(currentTool == "paintbrush" || currentTool == "pencil"){
             colorUsed = $("#color-input").val()
         }
 
