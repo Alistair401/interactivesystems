@@ -32,7 +32,6 @@ $(function () {
         
     });
 
-
     function drawData(data){
         data.forEach(function(element){
             if(element.drawing){
@@ -71,6 +70,15 @@ $(function () {
         }
         $('#chat-log').append(data.user+": "+data.text + "<br>");
     });
+
+
+    socket.on("clearCanvas1",function(data){
+        console.log("Canvas cleared");
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.canvas.width = ctx.canvas.width;
+    });
+
+
     socket.on('moving', function (data) {
         if (data.drawing) {
             if(data.action == "pencil"){

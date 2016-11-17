@@ -218,7 +218,7 @@ io.sockets.on('connection', function (socket) {
         if(room){
             var contents = data.imagedata;
             rooms[room] = [];
-            io.to(room).emit('restore', contents);     
+            io.to(room).emit("clearCanvas1", contents);     
             db.run("UPDATE session SET image = ? WHERE id = ?",[contents,room],function(err){
                 if (err){
                     console.log("Error saving canvas");
