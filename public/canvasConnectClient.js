@@ -25,8 +25,6 @@ $(function () {
         drawData(data);
     });
 
-
-<<<<<<< HEAD
         function drawData(data){//,width) {
             data.forEach(function(element){
                 if(element.drawing){
@@ -52,22 +50,12 @@ $(function () {
                         var localSymbol = element.textValue;
                         placeText(element.x, element.y, localSymbol, element.color, element.size, element.font);
                     }
-                }
-                if(element.action == "line"){
-                    drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color, element.width);
-                }
-                if(element.action == "import"){
-                    ctx.drawImage(element.img, element.x-10, element.y-88, 900, 900);
-                }
-                if(element.action == "saveData"){
-                    drawSaveData(element.src);
-                }
-                if(element.action == "symbol"){
-                    placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
-                }
+                    if(element.action == "saveData"){
+                        drawSaveData(element.src);
+                    }
             }
         });
-    }
+    };
 
     socket.on('chat-message', function(data) {
         if (chat_open == false)
@@ -246,10 +234,8 @@ $(function () {
     }
 
     function placeText(x, y, textInputVal, color, size, font){
-
         size = size.concat("px ");
         size = size.concat(font);
-        console.log(size);
         ctx.font = size;
         ctx.fillStyle = color;
         ctx.fillText(textInputVal, x, y - nav_height);
