@@ -45,7 +45,7 @@ $(function () {
                     eraseAt(element.x, element.y, element.width);
                 }
                 if(element.action == "text"){
-                    placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
+                    placeText(10, element.y + element.previousTextSize, element.textValue, element.color, element.size, element.font);
                 }
                 if(element.action == "line"){
                     drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color, element.width);
@@ -78,7 +78,6 @@ $(function () {
         ctx.canvas.width = ctx.canvas.width;
     });
 
-
     socket.on('moving', function (data) {
         if (data.drawing) {
             if(data.action == "pencil"){
@@ -91,7 +90,8 @@ $(function () {
                 eraseAt(data.x,data.y,data.width);
             }
             if(data.action == "text"){
-                placeText(data.x, data.y, data.textValue, data.color, data.size, data.font);
+                ctx.clearRect(10, data.previousTextSize, ctx.measureText(data.previousText).width, data.previousTextSize + data.parsedSize);
+                placeText(10, data.y + data.previousTextSize, data.textValue, data.color, data.size, data.font);
             }
             if(data.action == "line"){
                 drawLine(data.prev_x, data.prev_y, data.x, data.y, data.color, data.width);
@@ -101,7 +101,7 @@ $(function () {
                 img.innerHTML = '<img src="#" alt="Imported image" width="220" height="277"/>';
                 img.id = 'importImg';
                 img.src = data.src;
-                ctx.drawImage(img, data.x-10, data.y-88, 200, 200);
+                ctx.drawImage(img, data.x-10, data.y-88, data.w, data.h);
             }
             if(data.action == "symbol"){
                 var localSymbol = data.textValue;
@@ -117,33 +117,26 @@ $(function () {
         prev.x = e.pageX;
         prev.y = e.pageY;
         if (currentTool == "import"){
+            var sizeInput = $("#size-input").val();
+            var sizeInputSplit = sizeInput.split(" "); 
+            var w = sizeInputSplit[0];
+            var h = sizeInputSplit[1];
             socket.emit('tool', {
                 'x': e.pageX
                 , 'y': e.pageY
                 , 'action' : currentTool
                 , 'drawing': active
                 , 'src': img.src
+                , 'w': w
+                , 'h': h
                 , });
-            ctx.drawImage(img, e.pageX-10, e.pageY-88, 200, 200);
+            ctx.drawImage(img, e.pageX-10, e.pageY-88, w, h);
         }
     });
 
     canvas.bind('mouseup', function (e) {
         var fontSel = document.getElementById('font-picker');
         var fontSelValue = fontSel.options[fontSel.selectedIndex];
-        if (currentTool == "text"){
-            socket.emit('tool', {
-                'x': e.pageX
-                , 'y': e.pageY
-                , 'action' : currentTool
-                , 'drawing': active
-                , 'textValue': $('#text-input').val()
-                , 'color': $("#color-input").val()
-                , 'size' :  $("#size-input").val()
-                , 'font' : fontSelValue.text
-                , });
-            placeText(e.pageX, e.pageY, $('#text-input').val(), $("#color-input").val(), $("#size-input").val(), fontSelValue.text);
-        }
         if (currentTool == "symbol" && symbol != null){
             socket.emit('tool', {
                 'x': e.pageX
@@ -217,6 +210,43 @@ $(function () {
         }
     });
 
+    var lineStack = new Array();
+    var previousText = $('#text-input').val();
+    var previousTextSize = 0;//parseInt(ctx.font);
+    $('#text-input').keyup(function(e){
+        if (currentTool == "text"){
+            var fontSel = document.getElementById('font-picker');
+            var fontSelValue = fontSel.options[fontSel.selectedIndex];
+            var sizeInputVal = Number($("#size-input").val());
+            if (e.which != 13){
+                if (e.which != 8 || (previousText != "")){
+                    socket.emit('tool', {
+                        'y': nav_height+sizeInputVal
+                        , 'action' : currentTool
+                        , 'drawing': true
+                        , 'textValue': $('#text-input').val()
+                        , 'color': $("#color-input").val()
+                        , 'size' :  $("#size-input").val()
+                        , 'font' : fontSelValue.text
+                        , 'previousText' : previousText
+                        , 'previousTextSize' : previousTextSize
+                        , 'parsedSize' : parseInt(ctx.font)
+                        , });
+                    ctx.clearRect(10, previousTextSize, ctx.measureText(previousText).width, previousTextSize + parseInt(ctx.font));
+                    placeText(10, nav_height + sizeInputVal + previousTextSize, $('#text-input').val(), $("#color-input").val(), $("#size-input").val(), fontSelValue.text);
+                    previousText = $('#text-input').val();   
+                } else {
+                    previousTextSize = previousTextSize - parseInt(ctx.font);
+                    document.getElementById('text-input').value = lineStack.pop();
+                }
+            } else {
+                    previousTextSize = previousTextSize + parseInt(ctx.font);
+                    lineStack.push($('#text-input').val());
+                    document.getElementById('text-input').value = "";
+            }
+        }
+    });
+
     function drawLine(fromx, fromy, tox, toy, color, width){
         ctx.beginPath();
         ctx.moveTo(fromx, fromy - nav_height);
@@ -247,7 +277,7 @@ $(function () {
     }
 
     function placeText(x, y, textInputVal, color, size, font){
-        size = size.concat("px ");
+        size = size.concat("pt ");
         size = size.concat(font);
         ctx.font = size;
         ctx.fillStyle = color;
@@ -323,6 +353,7 @@ $(function () {
                 setButtonsDefault()
                 $(".color-picker").css("visibility", "visible");
                 $(".size-picker").css("visibility", "visible");
+                $("#size-input").attr("placeholder", "");
                 $(".text-picker").css("visibility", "visible");
                 $("#font-picker").css("visibility", "visible");
             }
@@ -342,6 +373,8 @@ $(function () {
             if ($(this).children().html() == " Import Image"){
                 currentTool = "import";
                 setButtonsDefault();
+                $(".size-picker").css("visibility", "visible");
+                $("#size-input").attr("placeholder", "Enter width height");
                 $("#imgUploadLbl").css("visibility", "visible");
             }
             if ($(this).children().html() == " Move Tool"){
