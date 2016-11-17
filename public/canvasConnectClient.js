@@ -13,8 +13,6 @@ $(function () {
         , win = $(window)
         , canvas = $('#main-canvas')
         , ctx = canvas[0].getContext('2d');
-//    canvas.width = canvas.clientWidth;
-//    canvas.height = canvas.clientHeight;
     // A flag for drawing activity
     var active = false;
     var socket = io();
@@ -56,6 +54,11 @@ $(function () {
                 if(element.action == "symbol"){
                     placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
                 }
+                if(element.action == "clear"){
+                    console.log("Canvas cleared from load")
+                    ctx.clearRect(0,0,1920,1080);
+                }
+                
 
             }
         });
@@ -294,13 +297,12 @@ $(function () {
         importImg(this);
     });
 
-    //TODO
     function clearCanvas(){
-
-        //ctx.clearRect(0,0,canvas.width,canvas.height);
-        //ctx.canvas.width = ctx.canvas.width;
-        //var image = canvas.get(0).toDataURL("image/png");
-        socket.emit("clear-canvas",{});//{imagedata:image});
+        ctx.clearRect(0,0,1920,1080);
+        socket.emit('tool', {
+            'action' : "clear"
+            , 'drawing': true
+        });
     }
 
         nav_height = $('nav').outerHeight();
@@ -378,7 +380,6 @@ $(function () {
             this.download = "whiteboard.png";
         })
         $("#clear").click(function(){
-            console.log("Clearing canvas");
             clearCanvas();
         });
         $("#invite").click(function(){

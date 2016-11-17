@@ -213,23 +213,6 @@ io.sockets.on('connection', function (socket) {
     });
 
 
-    socket.on("clear-canvas",function(data){
-        var room = socket.handshake.session.room;
-        var temp;
-        var deletions = [];
-        if(room){
-            for(var i in rooms[room]){
-                if(rooms[room][i].drawing){
-                    rooms[room][i].action = "eraser";
-
-                }
-            }
-            io.to(room).emit("clearing",rooms[room]);
-
-            //var contents = data.imagedata;
-            //io.to(room).emit("clearCanvas1", contents);     
-        }
-    });
 
 
 });
