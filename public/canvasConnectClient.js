@@ -115,6 +115,11 @@ $(function () {
                 var localSymbol = data.textValue;
                 placeText(data.x, data.y, localSymbol, data.color, data.size, data.font )
             }
+
+            if(data.action == "clear"){
+                console.log("Canvas cleared from load");
+                ctx.clearRect(0,0,canvas.get(0).width,canvas.get(0).height);
+            }
         }
     });
 
