@@ -400,7 +400,7 @@ $(function () {
                 currentTool = "import";
                 setButtonsDefault();
                 $(".size-picker").css("visibility", "visible");
-                $("#size-input").attr("placeholder", "Enter width height");
+                $("#size-input").attr("placeholder", "example: 1920 1080");
                 $("#imgUploadLbl").css("visibility", "visible");
             }
             if ($(this).children().html() == " Move Tool"){
