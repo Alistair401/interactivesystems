@@ -74,7 +74,8 @@ $(function () {
             $('#chat-badge').css("visibility","visible");
           drawNumMessages();
         }
-        $('#chat-log').append(data.user+": "+data.text + "<br>");
+	if (data.text.match("<(\"[^\"]*\"|'[^']*'|[^'\">])*>") == null)
+		$('#chat-log').append(data.user+": "+data.text + "<br>");
     });
 
 
@@ -311,6 +312,13 @@ $(function () {
         ctx.fillText(textInputVal, x, y - nav_height);
     }
 
+    function textKeyPress(event){
+	if (event.keyCode == 13)
+	{
+		return true;
+	}
+    }
+
     function saveCanvas(){
         var image;
         image = canvas.get(0).toDataURL('image/png');
@@ -353,6 +361,14 @@ $(function () {
             , 'drawing': true
         });
     }
+
+	$('#chat-box').on('keydown', function(e) {
+    		if (e.which == 13) {
+        		e.preventDefault();
+			socket.emit('chat-message', {'user':null, 'text':$('#chat-box').val().toString()})
+	    		$('#chat-box').val("");
+    		}
+	});
 
         nav_height = $('nav').outerHeight();
         $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
@@ -414,7 +430,8 @@ $(function () {
         });
 
         $('#send').click(function(){
-            socket.emit('chat-message', {'user':null, 'text':$('#chat-box').val()})
+            socket.emit('chat-message', {'user':null, 'text':$('#chat-box').val().toString()})
+	    $('#chat-box').val("");
         })
 
         $(window).resize(function () {

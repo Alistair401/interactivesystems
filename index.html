@@ -105,7 +105,7 @@
                 <div class="chat">
                     <ul id="chat-log"></ul>
                     <div>
-                        <textarea id="chat-box" class="form-control"></textarea>
+                        <textarea type=text id="chat-box" class="form-control" onkeypress="return textKeyPress(event)"></textarea>
                     </div>
                     <button class="btn btn default" id="send">Send</button>
                 </div>
