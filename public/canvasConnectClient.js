@@ -25,11 +25,6 @@ $(function () {
         $('#chat-badge').css("top", (nav_height + 2) + "px");
     });
 
-    // Sets up the chat box and gets the offset due to the navbar
-    nav_height = $('nav').outerHeight();
-    $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
-    $('#chat-badge').css("top", (nav_height + 2) + "px");
-
     // Loads all the actions for the room from the server
     socket.emit("load_actions");
 
@@ -473,6 +468,11 @@ $(function () {
     $("#invite").click(function () {
         socket.emit("get_invite_key");
     });
+    
+    // Sets up the chat box and gets the offset due to the navbar
+    nav_height = $('nav').outerHeight();
+    $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
+    $('#chat-badge').css("top", (nav_height + 2) + "px");
 
 });
 // Reset all standard buttons to be hidden
@@ -482,6 +482,11 @@ function setButtonsDefault() {
     $("#font-form").css("display", "none");
     $("#img-picker").css("display", "none");
     $("#symbol-tool-menu").css("display", "none");
+    
+    // Sets up the chat box and gets the offset due to the navbar
+    nav_height = $('nav').outerHeight();
+    $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
+    $('#chat-badge').css("top", (nav_height + 2) + "px");
 }
 
 // chat panel javascript
