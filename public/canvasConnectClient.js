@@ -17,6 +17,7 @@ $(function () {
     var active = false;
     var socket = io();
     var img;
+    var URL = document.URL;
 
     // Fits the chat box to the window if the screen is resized
     $(window).resize(function () {
@@ -473,6 +474,8 @@ $(function () {
     nav_height = $('nav').outerHeight();
     $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
     $('#chat-badge').css("top", (nav_height + 2) + "px");
+    
+    $("#host-address").html(URL);
 
 });
 // Reset all standard buttons to be hidden
