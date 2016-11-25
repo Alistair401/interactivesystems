@@ -45,15 +45,22 @@ app.get('/session/:slug', function (req, res) {
 
 app.get('/join/:slug', function (req, res) {
     var sess = req.session;
+    var key = req.params.slug;
     if (!sess.user){
+        sess.invite = key;
+        sess.save();
         res.redirect('/login');
     }
-    var key = req.params.slug;
     if (key in keys){
         console.log("User: " + sess.user + " Joined project: " + keys[key]);
         sess.room = keys[key];
         sess.save();
-        db.run("INSERT INTO user_session (username, session_id) VALUES ( ? , ? )", [sess.user,keys[key]]);
+        db.get("SELECT session_id FROM user_session WHERE session_id = ? AND username = ? ",[keys[key],sess.user],function(err,row){
+            if (!row){
+                db.run("INSERT INTO user_session (username, session_id) VALUES ( ? , ? )", [sess.user,keys[key]]);
+            }
+        });
+        
     }
     res.redirect('/');
 });
@@ -78,8 +85,24 @@ app.get('/login', function (req, res) {
 
 // Serve project_select.html when /project is accessed
 app.get('/project', function (req, res) {
-    if (!req.session.user){
+    var sess = req.session;
+    if (!sess.user){
          res.redirect('/login');
+    }
+    if (sess.invite){
+        key = sess.invite
+        if (key in keys){
+            console.log("User: " + sess.user + " Joined project: " + keys[key]);
+            sess.room = keys[key];
+            sess.invite = null;
+            sess.save();
+            db.get("SELECT session_id FROM user_session WHERE session_id = ? AND username = ? ",[keys[key],sess.user],function(err,row){
+            if (!row){
+                db.run("INSERT INTO user_session (username, session_id) VALUES ( ? , ? )", [sess.user,keys[key]]);
+            }
+        });
+        }
+        res.redirect('/');
     }
     res.sendFile('project_select.html', {
         root: __dirname
@@ -104,11 +127,8 @@ io.sockets.on('connection', function (socket) {
             }
             saveData = {src: row.image}
             io.to(room).emit("actions", {actions: rooms[room], save: saveData});
-            
         });
         
-        
-
     });
 
     socket.on("get_invite_key",function(){
