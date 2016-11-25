@@ -18,8 +18,25 @@ $(function () {
     var socket = io();
     var img;
 
+    // Fits the chat box to the window if the screen is resized
+    $(window).resize(function () {
+        nav_height = $('nav').outerHeight();
+        $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
+        $('#chat-badge').css("top", (nav_height + 2) + "px");
+    });
+
+    // Sets up the chat box and gets the offset due to the navbar
+    nav_height = $('nav').outerHeight();
+    $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
+    $('#chat-badge').css("top", (nav_height + 2) + "px");
+
+    // Loads all the actions for the room from the server
     socket.emit("load_actions");
 
+    // Clears all buttons from the nav bar
+    setButtonsDefault();
+
+    // Receives all the actions including the saved canvas in the database
     socket.on("actions", function (data) {
         function callback() {
             drawData(data.actions);
@@ -32,6 +49,13 @@ $(function () {
 
     });
 
+    // If an invite key is requested, retreives one
+    socket.on("rec_invite_key", function (key) {
+        $('#invite-key').html(key);
+        $('#invite-modal').modal('show');
+    });
+
+    // Handles action loading
     function drawData(data) {
         data.forEach(function (element) {
             if (element.drawing) {
@@ -54,13 +78,16 @@ $(function () {
                     drawLine(element.prev_x, element.prev_y, element.x, element.y, element.color, element.width);
                 }
                 if (element.action == "import") {
-                    ctx.drawImage(element.img, element.x - 10, element.y - 88, 900, 900);
+                    img = document.createElement("img");
+                    img.innerHTML = '<img src="#" alt="Imported image" width="220" height="277"/>';
+                    img.id = 'importImg';
+                    img.src = element.src;
+                    ctx.drawImage(img, element.x, element.y);
                 }
                 if (element.action == "symbol") {
                     placeText(element.x, element.y, element.textValue, element.color, element.size, element.font);
                 }
                 if (element.action == "clear") {
-                    console.log("Canvas cleared from load")
                     ctx.clearRect(0, 0, canvas.get(0).width, canvas.get(0).height);
                 }
 
@@ -79,13 +106,11 @@ $(function () {
             $('#chat-log').append(data.user + ": " + data.text + "<br>");
     });
 
+    /*    socket.on("clearing", function (data) {
+            drawData(data);
+        });*/
 
-    socket.on("clearing", function (data) {
-        console.log(data);
-        drawData(data);
-    })
-
-
+    // Handles simultaneous editing
     socket.on('moving', function (data) {
         if (data.drawing) {
             if (data.action == "pencil") {
@@ -111,15 +136,13 @@ $(function () {
                 img.innerHTML = '<img src="#" alt="Imported image" width="220" height="277"/>';
                 img.id = 'importImg';
                 img.src = data.src;
-                ctx.drawImage(img, data.x - 10, data.y - 88, data.w, data.h);
+                ctx.drawImage(img, data.x, data.y);
             }
             if (data.action == "symbol") {
                 var localSymbol = data.textValue;
-                placeText(data.x, data.y, localSymbol, data.color, data.size, data.font)
+                placeText(data.x, data.y, localSymbol, data.color, data.size, data.font);
             }
-
             if (data.action == "clear") {
-                console.log("Canvas cleared from load");
                 ctx.clearRect(0, 0, canvas.get(0).width, canvas.get(0).height);
             }
         }
@@ -132,20 +155,14 @@ $(function () {
         prev.x = e.pageX;
         prev.y = e.pageY;
         if (currentTool == "import") {
-            var sizeInput = $("#size-input").val();
-            var sizeInputSplit = sizeInput.split(" ");
-            var w = sizeInputSplit[0];
-            var h = sizeInputSplit[1];
             socket.emit('tool', {
                 'x': e.pageX,
-                'y': e.pageY,
+                'y': e.pageY - nav_height,
                 'action': currentTool,
                 'drawing': active,
                 'src': img.src,
-                'w': w,
-                'h': h,
             });
-            ctx.drawImage(img, e.pageX - 10, e.pageY - 88, w, h);
+            ctx.drawImage(img, e.pageX, e.pageY - nav_height);
         }
     });
 
@@ -204,7 +221,7 @@ $(function () {
         var colorUsed;
 
         if (currentTool == "paintbrush" || currentTool == "pencil") {
-            colorUsed = $("#color-input").val()
+            colorUsed = $("#color-input").val();
         }
 
         if (currentTool != "text" && currentTool != "line" && currentTool != "import") {
@@ -222,12 +239,11 @@ $(function () {
         if (active) {
             switch (currentTool) {
                 case "pencil":
-                    drawLine(prev.x, prev.y, e.pageX, e.pageY, $("#color-input").val(), 1); //,$("#thickness-input").val());
+                    drawLine(prev.x, prev.y, e.pageX, e.pageY, $("#color-input").val(), 1);
                     prev.x = e.pageX;
                     prev.y = e.pageY;
                     break;
                 case "eraser":
-                    //drawCircle(e.pageX,e.pageY,$("#thickness-input").val(),"white");
                     eraseAt(e.pageX, e.pageY, $("#thickness-input").val());
                     break;
                     //NEW
@@ -304,8 +320,23 @@ $(function () {
         ctx.closePath();
         ctx.globalCompositeOperation = 'source-over';
     }
+    
+    function importImg(input) {
+        if (input.files[0]) {
+            var reader = new FileReader();
 
-    function placeText(x, y, textInputVal, color, size, font) {
+            reader.onload = function (e) {
+                img = document.createElement("img");
+                img.innerHTML = '<img src="#" alt="Imported image" width="220" height="277"/>';
+                img.id = 'importImg';
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function placeText(x, y, textInputVal, color, sizeVal, font) {
+        var size = sizeVal;
         size = size.concat("pt ");
         size = size.concat(font);
         ctx.font = size;
@@ -327,19 +358,8 @@ $(function () {
         });
     }
 
-    function importImg(input) {
-        if (input.files[0]) {
-            var reader = new FileReader();
-
-            reader.onload = function (e) {
-                img = document.createElement("img");
-                img.innerHTML = '<img src="#" alt="Imported image" width="220" height="277"/>';
-                img.id = 'importImg';
-                img.src = e.target.result;
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
+    
+    
 
     function drawSaveData(base64, callback) {
         var image = new Image();
@@ -348,12 +368,7 @@ $(function () {
             ctx.drawImage(image, 0, 0);
             callback();
         }
-
     }
-
-    $("#imgUpload").change(function () {
-        importImg(this);
-    });
 
     function clearCanvas() {
         ctx.clearRect(0, 0, canvas.get(0).width, canvas.get(0).height);
@@ -362,6 +377,7 @@ $(function () {
             'drawing': true
         });
     }
+
 
     $('#chat-box').on('keydown', function (e) {
         if (e.which == 13) {
@@ -374,64 +390,63 @@ $(function () {
         }
     });
 
-    nav_height = $('nav').outerHeight();
-    $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
-    $('#chat-badge').css("top", (nav_height + 2) + "px");
-    $(".btn").click(function () {
-        if ($(this).val() == "pencil") {
-            currentTool = "pencil";
-            setButtonsDefault()
-            $(".color-picker").css("visibility", "visible");
-        }
-        if ($(this).val() == "paintbrush") {
-            currentTool = "paintbrush";
-            setButtonsDefault()
-            $(".color-picker").css("visibility", "visible");
-            $(".thickness-picker").css("visibility", "visible");
-        }
-        if ($(this).val() == "eraser") {
-            currentTool = "eraser";
-            setButtonsDefault()
-            $(".thickness-picker").css("visibility", "visible");
-        }
-        if ($(this).val() == "text") {
-            currentTool = "text";
-            setButtonsDefault()
-            $(".color-picker").css("visibility", "visible");
-            $(".size-picker").css("visibility", "visible");
-            $("#size-input").attr("placeholder", "");
-            $(".text-picker").css("visibility", "visible");
-            $("#font-picker").css("visibility", "visible");
-        }
+    // ############ TOOL SELECTION ############
+
+    $('#pencil-tool').click(function () {
+        currentTool = "pencil";
+        setButtonsDefault();
+        $("#color-picker").css("display", "inline");
+    });
+
+    $('#paintbrush-tool').click(function () {
+        currentTool = "paintbrush";
+        setButtonsDefault();
+        $("#color-picker").css("display", "inline");
+        $("#thickness-picker").css("display", "inline-block");
+
+    });
+
+    $('#eraser-tool').click(function () {
+        currentTool = "eraser";
+        setButtonsDefault();
+        $("#thickness-picker").css("display", "inline-block");
+    });
+
+    $('#text-tool').click(function () {
+        currentTool = "text";
+        setButtonsDefault();
+        $("#font-form").css("display", "inline");
+        $("#color-picker").css("display", "inline");
+    });
+
+    $('#line-tool').click(function () {
+        currentTool = "line";
+        setButtonsDefault();
+        $("#color-picker").css("display", "inline");
+        $("#thickness-picker").css("display", "inline-block");
+    });
+
+    $('#import-tool').click(function () {
+        currentTool = "import";
+        setButtonsDefault();
+        $("#img-picker").css("display", "inline");
+    });
+
+    $('#symbol-tool').click(function () {
+        currentTool = "symbol";
+        setButtonsDefault();
+        $("#symbol-tool-menu").css("display", "inline");
     });
 
     $('.symbol').click(function () {
         symbol = $(this).text();
     });
-
-    $("#drop li a").click(function () {
-        if ($(this).children().html() == " Line Tool") {
-            currentTool = "line";
-            setButtonsDefault()
-            $(".color-picker").css("visibility", "visible");
-            $(".thickness-picker").css("visibility", "visible");
-        }
-        if ($(this).children().html() == " Import Image") {
-            currentTool = "import";
-            setButtonsDefault();
-            $(".size-picker").css("visibility", "visible");
-            $("#size-input").attr("placeholder", "example: 1920 1080");
-            $("#imgUploadLbl").css("visibility", "visible");
-        }
-        if ($(this).children().html() == " Move Tool") {
-            currentTool = "move";
-        }
-        if ($(this).children().html() == " Symbol Tool") {
-            currentTool = "symbol";
-            $(".standard-tool-menu").css("display", "none");
-            $(".symbol-tool-menu").css("display", "inline");
-        }
+    
+    $("#img-picker").change(function () {
+        importImg(this);
     });
+
+    // ############ PROJECT DROPDOWN SELECTION ############
 
     $('#send').click(function () {
         socket.emit('chat-message', {
@@ -439,48 +454,37 @@ $(function () {
             'text': $('#chat-box').val().toString()
         })
         $('#chat-box').val("");
-    })
-
-    $(window).resize(function () {
-        nav_height = $('nav').outerHeight();
-        $('.slide-panel').css("height", "calc(100% - " + nav_height + "px)");
-        $('#chat-badge').css("top", (nav_height + 2) + "px");
     });
 
     $('#save').click(function () {
         console.log("Canvas saved");
         saveCanvas();
     });
+
     $('#export').click(function () {
         this.href = canvas[0].toDataURL();
         this.download = "whiteboard.png";
-    })
+    });
+
     $("#clear").click(function () {
         clearCanvas();
     });
+
     $("#invite").click(function () {
         socket.emit("get_invite_key");
     });
 
-    socket.on("rec_invite_key", function (key) {
-        $('#invite-key').html(key);
-        $('#invite-modal').modal('show');
-    });
-    setButtonsDefault();
-
 });
-// chat panel javascript
+// Reset all standard buttons to be hidden
 function setButtonsDefault() {
-    $(".standard-tool-menu").css("display", "inline");
-    $(".symbol-tool-menu").css("display", "none");
-    $(".color-picker").css("visibility", "hidden");
-    $(".thickness-picker").css("visibility", "hidden");
-    $(".size-picker").css("visibility", "hidden");
-    $(".text-picker").css("visibility", "hidden");
-    $("#font-picker").css("visibility", "hidden");
-    $("#imgUploadLbl").css("visibility", "hidden");
+    $("#color-picker").css("display", "none");
+    $("#thickness-picker").css("display", "none");
+    $("#font-form").css("display", "none");
+    $("#img-picker").css("display", "none");
+    $("#symbol-tool-menu").css("display", "none");
 }
 
+// chat panel javascript
 function toggleChat() {
     if (chat_open == false) {
         document.getElementById("chat-panel").style.width = "245px";
@@ -491,8 +495,6 @@ function toggleChat() {
     } else {
         document.getElementById("chat-panel").style.width = "15px";
         chat_open = false;
-
-
     }
 }
 

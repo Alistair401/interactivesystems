@@ -84,20 +84,13 @@ body {
     display: inline;
     margin-left: 15px;
 }
-.color-picker{
-    visibility: hidden;
-}
 .cust-input-format{
     background-color: white;
     border-radius: 2px;
 }
-.thickness-picker{
+#thickness-picker{
     display: inline-block;
-    visibility: hidden;
-    width: 20%;
-}
-#imgUpload{
-    width: 100%;
+    width: 200px;
 }
 #num-messages{
   font-weight: bold;
@@ -111,13 +104,13 @@ body {
     right: 17px;
     visibility: hidden;
 }
-.standard-tool-menu{
+#standard-tool-menu{
     display:inline;
 }
-.symbol-tool-menu{
+#symbol-tool-menu{
     display:none;
 }
 .symbol{
     margin-left: 10px;
-    font-size: 25px;
+    font-size: 22px;
 }

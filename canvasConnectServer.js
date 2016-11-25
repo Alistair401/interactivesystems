@@ -225,7 +225,9 @@ io.sockets.on('connection', function (socket) {
                 db.run("UPDATE session SET image = ? WHERE id = ?",[contents,room],function(err){
                     if (err){
                         console.log("Error saving canvas");
-                    } 
+                    } else {
+                        rooms[room] = [];
+                    }
                 });
                 
             }
